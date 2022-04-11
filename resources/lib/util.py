@@ -348,8 +348,5 @@ def convertLang(sublang):
         language = 'Thai'
     elif sublang == '115':
         lang = 'yue'
-        language = '粵語'
-    else:
-        lang = 'en'
-        language = 'English'        
+        language = '粵語'    
     return lang

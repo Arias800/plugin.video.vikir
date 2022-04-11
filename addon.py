@@ -4,6 +4,7 @@ import re
 import sys
 import time
 import json
+import base64
 
 import urllib.request
 import urllib.parse
@@ -42,7 +43,7 @@ if d == '0':
 elif d == '1':
     d = 'asc'
 
-lang = convertLang(__settings__.getSetting('language'))
+lang = convertLang(__settings__.getSetting('lang'))
 
 _DEVICE_ID = '86085977d'  # used for android api
 _APP = '100005a'
@@ -53,7 +54,6 @@ Manifest_API = "https://manifest-viki.viki.io%s"
 
 #  Деклариране на константи
 md = xbmcvfs.translatePath(__Addon.getAddonInfo('path') + "resources/media/")
-MUA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/ 604.1.21 (KHTML,  like Gecko) Version/ 12.0 Mobile/17A6278a Safari/602.1.26'  # За симулиране на заявка от мобилно устройство
 UA = 'Mozilla/5.0 (Macintosh; MacOS X10_14_3; rv;93.0) Gecko/20100101 Firefox/93.0'  # За симулиране на заявка от  компютърен браузър
 
 
@@ -77,91 +77,65 @@ def CATEGORIES():
 
 
 def INDEX(url):
-        timestamp = str(int(time.time()))
-        #  print url
-        if 'search.json' in url:
-            req = urllib.request.Request(url)
-        else:
-            req = urllib.request.Request(url+timestamp)
-        req.add_header('User-Agent',  UA)
-        opener = urllib.request.build_opener()
-        f = opener.open(req)
-        jsonrsp = json.loads(f.read())
-        #  print jsonrsp['response'][0]['titles']['en']
-        
-        #  Начало на обхождането
-        for movie in range(0,  len(jsonrsp['response'])):
-            try:
-                if (jsonrsp['response'][movie]['flags']['licensed'] == True or fc == 'true' or debug == 'true'): #  Ако заглавието е лицензирано или са разрешени Фен каналите/дебъг режима
-                    if jsonrsp['response'][movie]['type'] == 'series': #  Ако е сериал
-                        try: #  Заглавие на английски език
-                            mt = str(jsonrsp['response'][movie]['titles']['en']).encode('utf-8',  'ignore')
-                        except:
-                            mt = 'TV Show Title'
-                        try: #  Описание на английски език
-                            mdes = str(jsonrsp['response'][movie]['descriptions']['en']).encode('utf-8',  'ignore')
-                        except:
-                            mdes = ''
-                        try: #  Poster
-                            pos = jsonrsp['response'][movie]['images']['poster']['url']
-                        except:
-                            pos = ''
-                        xbmcplugin.setContent(int(sys.argv[1]),  'season')
-                        addDir(mt, 'https://api.viki.io/v4/series/'+jsonrsp['response'][movie]['id']+'/episodes.json?page=1&per_page=50&app=' + _APP + '&t='+timestamp, mdes, 2, pos)
-                    else:  #  Ако е игрален филм или клип
-                        if (jsonrsp['response'][movie]['blocked'] == False or debug == 'true'): # Проверка за достъпност
-                            try:  # Продължителност на видеото
-                                dur = str(jsonrsp['response'][movie]['duration'])
-                            except:
-                                dur = ''
-                            try:  # Резолюция на видеото
-                                hd = str(jsonrsp['response'][movie]['flags']['hd'])
-                            except:
-                                hd = 'False'
-                            try:  # Име/описание на филма
-                                mt = str(jsonrsp['response'][movie]['titles']['en'])
-                            except:
-                                mt = 'Movie Title'
-                            try: # Автор/Студио
-                                at = str(jsonrsp['response'][movie]['author'],  'utf-8',  'ignore')
-                            except:
-                                at = ''
-                            try: # Movie ID
-                                mid = str(jsonrsp['response'][movie]['id'])
-                            except:
-                                mid = ''
-                            try: # Poster
-                                pos = str(jsonrsp['response'][movie]['images']['poster']['url'])
-                            except:
-                                pos = ''
-                            try: # Рейтинг
-                                rating = jsonrsp['response'][movie]['rating']
-                            except:
-                                rating = 'G'
-                            try: # Оценка
-                                ar = str(jsonrsp['response'][movie]['container']['review_stats']['average_rating'])
-                            except:
-                                ar = '0'
-                            xbmcplugin.setContent(int(sys.argv[1]),  'movie')
-                            addLink(mt, mid+'@'+pos+'@'+mt, dur, hd, mt, at, rating, ar, 4, pos)
-            except:
-                xbmc.executebuiltin('Notification(%s,  %s,  %d,  %s)'%('VIKI®', 'Error in INDEX Function',  4000,  md+'DefaultIconError.png'))
-        # Край на обхождането
-        
-        # Ако имаме още страници...
-        if jsonrsp['more'] == True:
-            getpage=re.compile('(.+?)&page=(.+?)&per_page=(.+?)&t=').findall(url)
-            for fronturl,  page,  backurl in getpage:
-                newpage = int(page)+1
-                url = fronturl + '&page=' + str(newpage) + '&per_page=' + backurl + '&t='
-                # print 'URL OF THE NEXT PAGE IS' + url
-                addDir('Next page >>', url, '', 1, md+'DefaultFolder.png')
+    timestamp = str(int(time.time()))
+    #  print url
+    if 'search.json' in url:
+        req = urllib.request.Request(url)
+    else:
+        req = urllib.request.Request(url + timestamp)
+    req.add_header('User-Agent', UA)
+    opener = urllib.request.build_opener()
+    f = opener.open(req)
+    jsonrsp = json.loads(f.read())
 
-  # Разлистване епизодите на сериала
+    #  Начало на обхождането
+    for movie in range(0, len(jsonrsp['response'])):
+        if (jsonrsp['response'][movie]['flags']['licensed'] is True or fc == 'true' or debug == 'true'):  # Ако заглавието е лицензирано или са разрешени Фен каналите/дебъг режима
+            if jsonrsp['response'][movie]['type'] == 'series':  # Ако е сериал
+                try:
+                    mt = str(jsonrsp['response'][movie]['titles'][lang]).encode('utf-8', 'ignore')
+                    mdes = str(jsonrsp['response'][movie]['descriptions'][lang]).encode('utf-8', 'ignore')
+                except KeyError:
+                    mt = str(jsonrsp['response'][movie]['titles']["en"]).encode('utf-8', 'ignore')
+                    mdes = str(jsonrsp['response'][movie]['descriptions']["en"]).encode('utf-8', 'ignore')
+
+                pos = jsonrsp['response'][movie]['images']['poster']['url']
+                xbmcplugin.setContent(int(sys.argv[1]), 'season')
+                addDir(mt, f'https://api.viki.io/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?page=1&per_page=50&app={_APP}&t={timestamp}', mdes, 2, pos)
+            else:  # Ако е игрален филм или клип
+                if (jsonrsp['response'][movie]['blocked'] is False or debug == 'true'):  # Проверка за достъпност
+                    dur = str(jsonrsp['response'][movie]['duration'])
+                    hd = str(jsonrsp['response'][movie]['flags']['hd'])
+
+                    try:
+                        mt = jsonrsp['response'][movie]['titles'][lang]
+                    except KeyError:
+                        mt = jsonrsp['response'][movie]['titles']["en"]
+
+                    at = jsonrsp['response'][movie]['author']
+                    mid = str(jsonrsp['response'][movie]['id'])
+                    pos = str(jsonrsp['response'][movie]['images']['poster']['url'])
+                    rating = jsonrsp['response'][movie]['rating']
+                    ar = str(jsonrsp['response'][movie]['container']['review_stats']['average_rating'])
+                    xbmcplugin.setContent(int(sys.argv[1]), 'movie')
+                    addLink(mt, mid + '@' + pos + '@' + mt, dur, hd, mt, at, rating, ar, 4, pos)
+    # Край на обхождането
+    
+    # Ако имаме още страници...
+    if jsonrsp['more'] is True:
+        getpage = re.compile('(.+?)&page=(.+?)&per_page=(.+?)&t=').findall(url)
+        for fronturl, page, backurl in getpage:
+            newpage = int(page) + 1
+            url = fronturl + '&page=' + str(newpage) + '&per_page=' + backurl + '&t='
+            # print 'URL OF THE NEXT PAGE IS' + url
+            addDir('Next page >>', url, '', 1, md + 'DefaultFolder.png')
+
+
+# Разлистване епизодите на сериала
 def PREPARE(url):
     xbmcplugin.setContent(int(sys.argv[1]), 'episode')
     timestamp = str(int(time.time()))
-    # print url
+
     req = urllib.request.Request(url + '&direction=' + d)  # Задаване реда на епизодите
     req.add_header('User-Agent', UA)
     opener = urllib.request.build_opener()
@@ -170,47 +144,25 @@ def PREPARE(url):
     
     # Начало на обхождането
     for episode in range(0, len(jsonrsp['response'])):
-        if (jsonrsp['response'][episode]['blocked'] is False or debug == 'true'): # Проверка за достъпност - блокирано или не
-            try: # Име на сериала
-                tsn = str(jsonrsp['response'][episode]['container']['titles']['en'])
-            except:
-                tsn = ''
-            try: # Номер епизода на сериала
-                en = str(jsonrsp['response'][episode]['number'])
-            except:
-                en = ''
-            try: # ID на епизода
-                ide = str(jsonrsp['response'][episode]['id'])
-            except:
-                ide = ''
-            try: # Poster URL
-                pos = str(jsonrsp['response'][episode]['images']['poster']['url'])
-            except:
-                pos = ''
-            try: # Duration
-                dur = str(jsonrsp['response'][episode]['duration'])
-            except:
-                dur = ''
-            try: # Среден рейтинг
-                ar = str(jsonrsp['response'][episode]['container']['review_stats']['average_rating'])
-            except:
-                ar = ''
-            try: # Резолюция на видеото
-                hd = str(jsonrsp['response'][episode]['flags']['hd'])
-            except:
-                hd = 'False'
-            try: # Име/описание на епизода
+        if (jsonrsp['response'][episode]['blocked'] is False or debug == 'true'):  # Проверка за достъпност - блокирано или не
+            try:
+                tsn = str(jsonrsp['response'][episode]['container']['titles'][lang])
                 et = str(jsonrsp['response'][episode]['titles'][lang])
-            except:
-                et = ''
-            try: # Автор/Студио
-                at = str(jsonrsp['response'][episode]['author'])
-            except:
-                at = ''
-            try: # Рейтинг
-                rating = str(jsonrsp['response'][episode]['rating'])
-            except:
-                rating = 'G'
+            except KeyError:
+                tsn = str(jsonrsp['response'][episode]['container']['titles']['en'])
+                try:
+                    et = str(jsonrsp['response'][episode]['titles']['en'])
+                except KeyError:
+                    et = ""
+
+            en = str(jsonrsp['response'][episode]['number'])
+            ide = str(jsonrsp['response'][episode]['id'])
+            pos = str(jsonrsp['response'][episode]['images']['poster']['url'])
+            dur = str(jsonrsp['response'][episode]['duration'])
+            ar = str(jsonrsp['response'][episode]['container']['review_stats']['average_rating'])
+            hd = str(jsonrsp['response'][episode]['flags']['hd'])
+            at = str(jsonrsp['response'][episode]['author'])
+            rating = str(jsonrsp['response'][episode]['rating'])
             addLink(tsn + ' Episode ' + en, ide + '@' + pos + '@' + et, dur, hd, et, at, rating, ar, 4, pos)
     if len(jsonrsp['response']) == 0:
         addDir('There are no episodes for now', '', '', '', md + 'DefaultFolderBack.png')
@@ -258,13 +210,12 @@ def SEARCH(url):
     xbmcplugin.setContent(int(sys.argv[1]), 'season')
     keyb = xbmc.Keyboard('', 'Search in VIKI® Database')
     keyb.doModal()
-    searchText = ''
-    if (keyb.isConfirmed()):
+
+    if (keyb.isConfirmed() and len(keyb.getText()) > 0):
         searchText = urllib.parse.quote_plus(keyb.getText())
         searchText = searchText.replace(' ', '+')
         searchurl = url.encode('utf-8') + searchText.encode('utf-8', 'ignore')
         searchurl = searchurl.decode('utf-8')
-        # print ('SEARCHING:' + searchurl)
         INDEX(searchurl)
     else:
         addDir('Go to main menu...', '', '', '', md + 'DefaultFolderBack.png')
@@ -281,18 +232,12 @@ def LOADBYID():
         addDir('Go to main menu...', '', '', '', md + 'DefaultFolderBack.png')
 
 
-def SIGN(pth, version=5, url=""):
+def SIGN(pth, version=5):
     timestamp = int(time.time())
-    if "license" in pth:
-        rawtxt = f'/v{version}/{pth}?app=100000a&app_ver=4.0.96&dt=dt3&video_id={url}'  
-        sig = hmac.new(
-            _APP_SECRET.encode('ascii'), f'{rawtxt}&h_timestamp={timestamp}'.encode('ascii'), hashlib.sha1).hexdigest()
-        return Manifest_API % rawtxt, timestamp, sig
-    else:
-        rawtxt = f'/v{version}/{pth}?drms=dt1,dt2,dt3&device_id={_DEVICE_ID}&app={_APP}'        
-        sig = hmac.new(
-            _APP_SECRET.encode('ascii'), f'{rawtxt}&t={timestamp}'.encode('ascii'), hashlib.sha1).hexdigest()
-        return Base_API % rawtxt, timestamp, sig
+    rawtxt = f'/v{version}/{pth}?drms=dt1,dt2,dt3&device_id={_DEVICE_ID}&app={_APP}'        
+    sig = hmac.new(
+        _APP_SECRET.encode('ascii'), f'{rawtxt}&t={timestamp}'.encode('ascii'), hashlib.sha1).hexdigest()
+    return Base_API % rawtxt, timestamp, sig
 
 
 # Зареждане на видео и субтитри
@@ -317,7 +262,32 @@ def PLAY(name, url, iconimage):
     f = opener.open(req)
     jsonrsp = json.loads(f.read())
 
-    urlLIC, timestamp, sig = SIGN('license', 1, url)
+    req = urllib.request.Request("https://www.viki.com/api/videos/" + url)
+    req.add_header('User-Agent', UA)
+    req.add_header('x-client-user-agent', UA)
+    req.add_header('x-viki-app-ver', _APP_VERSION)
+    req.add_header('Referer', 'https://www.viki.com/videos/' + url)
+    opener = urllib.request.build_opener()
+    f = opener.open(req)
+    base64elem = json.loads(f.read())['drm']
+    decodeData = base64.b64decode(base64elem)
+    manifestUrl = json.loads(decodeData)['dt3']
+
+    headers = {
+        "Host": "manifest-viki.viki.io",
+        "User-Agent": UA,
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Referer": "https://www.viki.com/",
+        "Origin": "https://www.viki.com",
+        "DNT": "1",
+        "Connection": "keep-alive",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "cross-site",
+        "TE": "trailers",
+    }
 
     is_helper = inputstreamhelper.Helper('mpd', drm='com.widevine.alpha')
     if is_helper.check_inputstream():
@@ -332,7 +302,7 @@ def PLAY(name, url, iconimage):
             li.setProperty('inputstream', 'inputstream.adaptive')
             li.setProperty('inputstream.adaptive.manifest_type', 'mpd')
             li.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-            li.setProperty('inputstream.adaptive.license_key', urlLIC + '&h_timestamp=' + str(timestamp) + '&sig=' + str(sig) + '|User-Agent=' + urllib.parse.quote_plus(UA) + '&Origin=https://www.viki.com&Referer=https://www.viki.com|R{SSM}|')
+            li.setProperty('inputstream.adaptive.license_key', manifestUrl + '|%s|R{SSM}|' % urllib.parse.urlencode(headers))       
             li.setProperty('inputstream.adaptive.stream_headers', 'User-Agent=' + urllib.parse.quote_plus(UA) + '&Origin=https://www.viki.com&Referer=https://www.viki.com&verifypeer=false')
         else:
             xbmc.executebuiltin('Notification(%s,  %s,  %d,  %s)' % ('VIKI®', 'API does not return a result', 4000, md + 'OverlayLocked.png'))
@@ -412,19 +382,19 @@ mode = None
 
 try:
     url = urllib.parse.unquote_plus(params["url"])
-except:
+except (TypeError, KeyError):
     pass
 try:
     name = urllib.parse.unquote_plus(params["name"])
-except:
+except (TypeError, KeyError):
     pass
 try:
     name = urllib.parse.unquote_plus(params["iconimage"])
-except:
+except (TypeError, KeyError):
     pass
 try:
     mode = int(params["mode"])
-except:
+except (TypeError, KeyError):
     pass
 
 # Списък на отделните подпрограми/модули в тази приставка - трябва напълно да отговаря на кода отгоре
