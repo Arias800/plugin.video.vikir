@@ -59,21 +59,21 @@ UA = 'Mozilla/5.0 (Macintosh; MacOS X10_14_3; rv;93.0) Gecko/20100101 Firefox/93
 
 #  Меню с директории в приставката
 def CATEGORIES():
-    addDir('Search', 'https://api.viki.io/v4/search.json?page=1&per_page=50&app=' + _APP + '&term=', '', 3, md + 'DefaultAddonsSearch.png')
-    addLink('Play video by ID', 'loadbyid', '0', 'True', '', '', 'G', '5.0', 8, md + 'DefaultStudios.png')
-    addDir('Browse Movies by Genre', 'movies', '', 6, md + 'DefaultFolder.png')
-    addDir('Browse Movies by Country', 'movies', '', 7, md + 'DefaultFolder.png')
-    addDir('New Movies', 'https://api.viki.io/v4/movies.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png')
-    addDir('Recent Movies', 'https://api.viki.io/v4/movies.json?sort=views_recent&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png')
-    addDir('Popular Movies', 'https://api.viki.io/v4/movies.json?sort=trending&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png')
-    addDir('Best Movies', 'https://api.viki.io/v4/movies.json?sort=views&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png')
-    addDir('Browse Series by Genre', 'series', '', 6, md + 'DefaultFolder.png')
-    addDir('Browse Series by Country', 'series', '', 7, md + 'DefaultFolder.png')
-    addDir('New Series', 'https://api.viki.io/v4/series.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png')
-    addDir('Recent Series', 'https://api.viki.io/v4/series.json?sort=views_recent&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png')
-    addDir('Popular Series', 'https://api.viki.io/v4/series.json?sort=trending&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png')
-    addDir('Best Series', 'https://api.viki.io/v4/series.json?sort=views&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png')
-    addDir('Latest Clips', 'https://api.viki.io/v4/clips.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png')
+    addDir('Search', 'https://api.viki.io/v4/search.json?page=1&per_page=50&app=' + _APP + '&term=', '', 3, md + 'DefaultAddonsSearch.png', "addons")
+    addLink('Play video by ID', 'loadbyid', '0', 'True', '', '', 'G', '5.0', 8, md + 'DefaultStudios.png', "addons")
+    addDir('Browse Movies by Genre', 'movies', '', 6, md + 'DefaultFolder.png', "addons")
+    addDir('Browse Movies by Country', 'movies', '', 7, md + 'DefaultFolder.png', "addons")
+    addDir('New Movies', 'https://api.viki.io/v4/movies.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Recent Movies', 'https://api.viki.io/v4/movies.json?sort=views_recent&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Popular Movies', 'https://api.viki.io/v4/movies.json?sort=trending&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Best Movies', 'https://api.viki.io/v4/movies.json?sort=views&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Browse Series by Genre', 'series', '', 6, md + 'DefaultFolder.png', "addons")
+    addDir('Browse Series by Country', 'series', '', 7, md + 'DefaultFolder.png', "addons")
+    addDir('New Series', 'https://api.viki.io/v4/series.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Recent Series', 'https://api.viki.io/v4/series.json?sort=views_recent&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Popular Series', 'https://api.viki.io/v4/series.json?sort=trending&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Best Series', 'https://api.viki.io/v4/series.json?sort=views&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Latest Clips', 'https://api.viki.io/v4/clips.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
 
 
 def INDEX(url):
@@ -101,7 +101,7 @@ def INDEX(url):
 
                 pos = jsonrsp['response'][movie]['images']['poster']['url']
                 xbmcplugin.setContent(int(sys.argv[1]), 'season')
-                addDir(mt, f'https://api.viki.io/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?page=1&per_page=50&app={_APP}&t={timestamp}', mdes, 2, pos)
+                addDir(mt, f'https://api.viki.io/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?page=1&per_page=50&app={_APP}&t={timestamp}', mdes, 2, pos, jsonrsp['response'][movie]['type'])
             else:  # Ако е игрален филм или клип
                 if (jsonrsp['response'][movie]['blocked'] is False or debug == 'true'):  # Проверка за достъпност
                     dur = str(jsonrsp['response'][movie]['duration'])
@@ -118,7 +118,7 @@ def INDEX(url):
                     rating = jsonrsp['response'][movie]['rating']
                     ar = str(jsonrsp['response'][movie]['container']['review_stats']['average_rating'])
                     xbmcplugin.setContent(int(sys.argv[1]), 'movie')
-                    addLink(mt, mid + '@' + pos + '@' + mt, dur, hd, mt, at, rating, ar, 4, pos)
+                    addLink(mt, mid + '@' + pos + '@' + mt, dur, hd, mt, at, rating, ar, 4, pos, jsonrsp['response'][movie]['type'])
     # Край на обхождането
     
     # Ако имаме още страници...
@@ -128,12 +128,11 @@ def INDEX(url):
             newpage = int(page) + 1
             url = fronturl + '&page=' + str(newpage) + '&per_page=' + backurl + '&t='
             # print 'URL OF THE NEXT PAGE IS' + url
-            addDir('Next page >>', url, '', 1, md + 'DefaultFolder.png')
+            addDir('Next page >>', url, '', 1, md + 'DefaultFolder.png', "addons")
 
 
 # Разлистване епизодите на сериала
 def PREPARE(url):
-    xbmcplugin.setContent(int(sys.argv[1]), 'episode')
     timestamp = str(int(time.time()))
 
     req = urllib.request.Request(url + '&direction=' + d)  # Задаване реда на епизодите
@@ -163,9 +162,9 @@ def PREPARE(url):
             hd = str(jsonrsp['response'][episode]['flags']['hd'])
             at = str(jsonrsp['response'][episode]['author'])
             rating = str(jsonrsp['response'][episode]['rating'])
-            addLink(tsn + ' Episode ' + en, ide + '@' + pos + '@' + et, dur, hd, et, at, rating, ar, 4, pos)
+            addLink(tsn + ' Episode ' + en, ide + '@' + pos + '@' + et, dur, hd, et, at, rating, ar, 4, pos, "episode")
     if len(jsonrsp['response']) == 0:
-        addDir('There are no episodes for now', '', '', '', md + 'DefaultFolderBack.png')
+        addDir('There are no episodes for now', '', '', '', md + 'DefaultFolderBack.png', "addons")
     # Край на обхождането
     
     # Ако имаме още страници...
@@ -175,7 +174,7 @@ def PREPARE(url):
             newpage = int(page) + 1
             url = fronturl + 'page=' + str(newpage) + '&per_page=50&app=' + _APP + '&t=' + timestamp
             # print 'URL OF THE NEXT PAGE IS' + url
-            addDir('Next page >>', url, '', 2, md + 'DefaultFolder.png')
+            addDir('Next page >>', url, '', 2, md + 'DefaultFolder.png', "addons")
 
 
 # Разлистване по жанр
@@ -218,7 +217,7 @@ def SEARCH(url):
         searchurl = searchurl.decode('utf-8')
         INDEX(searchurl)
     else:
-        addDir('Go to main menu...', '', '', '', md + 'DefaultFolderBack.png')
+        addDir('Go to main menu...', '', '', '', md + 'DefaultFolderBack.png', "addons")
 
 
 # Зареждане на клип по неговото ID
@@ -229,7 +228,7 @@ def LOADBYID():
         vid = urllib.parse.quote_plus(keyb.getText())
         PLAY('VIKI®', vid + '@0@50', md + 'DefaultStudios.png')
     else:
-        addDir('Go to main menu...', '', '', '', md + 'DefaultFolderBack.png')
+        addDir('Go to main menu...', '', '', '', md + 'DefaultFolderBack.png', "addons")
 
 
 def SIGN(pth, version=5):
@@ -302,7 +301,7 @@ def PLAY(name, url, iconimage):
             li.setProperty('inputstream', 'inputstream.adaptive')
             li.setProperty('inputstream.adaptive.manifest_type', 'mpd')
             li.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-            li.setProperty('inputstream.adaptive.license_key', manifestUrl + '|%s|R{SSM}|' % urllib.parse.urlencode(headers))       
+            li.setProperty('inputstream.adaptive.license_key', manifestUrl + '|%s&Content-Type=|R{SSM}|' % urllib.parse.urlencode(headers))       
             li.setProperty('inputstream.adaptive.stream_headers', 'User-Agent=' + urllib.parse.quote_plus(UA) + '&Origin=https://www.viki.com&Referer=https://www.viki.com&verifypeer=false')
         else:
             xbmc.executebuiltin('Notification(%s,  %s,  %d,  %s)' % ('VIKI®', 'API does not return a result', 4000, md + 'OverlayLocked.png'))
@@ -311,7 +310,7 @@ def PLAY(name, url, iconimage):
 
 
 # Модул за добавяне на отделно заглавие и неговите атрибути към съдържанието на показваната в Kodi директория - НЯМА НУЖДА ДА ПРОМЕНЯТЕ НИЩО ТУК
-def addLink(name, url, vd, hd, plot, author, rating, ar, mode, iconimage):
+def addLink(name, url, vd, hd, plot, author, rating, ar, mode, iconimage, types):
     u = sys.argv[0] + "?url=" + urllib.parse.quote_plus(url) + "&mode=" + str(mode) + "&name=" + urllib.parse.quote_plus(name)
     ok = True
     liz = xbmcgui.ListItem(name)
@@ -334,23 +333,25 @@ def addLink(name, url, vd, hd, plot, author, rating, ar, mode, iconimage):
     liz.addContextMenuItems(contextmenu)
     
     ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=False)
+    xbmcplugin.setContent(int(sys.argv[1]), types)
     return ok
 
 
 # Модул за добавяне на отделна директория и нейните атрибути към съдържанието на показваната в Kodi директория - НЯМА НУЖДА ДА ПРОМЕНЯТЕ НИЩО ТУК
-def addDir(name, url, plot, mode, iconimage):
+def addDir(name, url, plot, mode, iconimage, types):
     u = sys.argv[0] + "?url=" + urllib.parse.quote_plus(url) + "&mode=" + str(mode) + "&name=" + urllib.parse.quote_plus(name)
     ok = True
     liz = xbmcgui.ListItem(name)
     liz.setArt({'thumb': iconimage, 'poster': iconimage, 'banner': iconimage, 'fanart': iconimage, 'icon': 'DefaultFolder.png'})
     liz.setInfo(type="Video", infoLabels={"Title": name, "Plot": plot})
-    
+
     if len(plot) > 0:
         contextmenu = []
         contextmenu.append(('Information', 'XBMC.Action(Info)'))
         liz.addContextMenuItems(contextmenu)
-    
+
     ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=True)
+    xbmcplugin.setContent(int(sys.argv[1]), types)
     return ok
 
 
