@@ -49,7 +49,7 @@ _DEVICE_ID = '86085977d'  # used for android api
 _APP = '100005a'
 _APP_VERSION = '6.11.3'
 _APP_SECRET = 'd96704b180208dbb2efa30fe44c48bd8690441af9f567ba8fd710a72badc85198f7472'
-Base_API = 'https://api.viki.io%s'
+Base_API = 'https://api.viki.io'
 Manifest_API = "https://manifest-viki.viki.io%s"
 
 #  Деклариране на константи
@@ -59,21 +59,25 @@ UA = 'Mozilla/5.0 (Macintosh; MacOS X10_14_3; rv;93.0) Gecko/20100101 Firefox/93
 
 #  Меню с директории в приставката
 def CATEGORIES():
-    addDir('Search', 'https://api.viki.io/v4/search.json?page=1&per_page=50&app=' + _APP + '&term=', '', 3, md + 'DefaultAddonsSearch.png', "addons")
+    if not xbmc.getCondVisibility('system.platform.android'):
+        xbmc.executebuiltin('Notification(%s,  %s,  %d,  %s)' % ('VIKI®', 'This addon only work on Android', 4000, md + 'OverlayLocked.png'))
+        return False
+
+    addDir('Search', f'{Base_API}/v4/search.json?page=1&per_page=50&app=' + _APP + '&term=', '', 3, md + 'DefaultAddonsSearch.png', "addons")
     addLink('Play video by ID', 'loadbyid', '0', 'True', '', '', 'G', '5.0', 8, md + 'DefaultStudios.png', "addons")
     addDir('Browse Movies by Genre', 'movies', '', 6, md + 'DefaultFolder.png', "addons")
     addDir('Browse Movies by Country', 'movies', '', 7, md + 'DefaultFolder.png', "addons")
-    addDir('New Movies', 'https://api.viki.io/v4/movies.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
-    addDir('Recent Movies', 'https://api.viki.io/v4/movies.json?sort=views_recent&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
-    addDir('Popular Movies', 'https://api.viki.io/v4/movies.json?sort=trending&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
-    addDir('Best Movies', 'https://api.viki.io/v4/movies.json?sort=views&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('New Movies', f'{Base_API}/v4/movies.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Recent Movies', f'{Base_API}/v4/movies.json?sort=views_recent&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Popular Movies', f'{Base_API}/v4/movies.json?sort=trending&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Best Movies', f'{Base_API}/v4/movies.json?sort=views&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
     addDir('Browse Series by Genre', 'series', '', 6, md + 'DefaultFolder.png', "addons")
     addDir('Browse Series by Country', 'series', '', 7, md + 'DefaultFolder.png', "addons")
-    addDir('New Series', 'https://api.viki.io/v4/series.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
-    addDir('Recent Series', 'https://api.viki.io/v4/series.json?sort=views_recent&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
-    addDir('Popular Series', 'https://api.viki.io/v4/series.json?sort=trending&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
-    addDir('Best Series', 'https://api.viki.io/v4/series.json?sort=views&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
-    addDir('Latest Clips', 'https://api.viki.io/v4/clips.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('New Series', f'{Base_API}/v4/series.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Recent Series', f'{Base_API}/v4/series.json?sort=views_recent&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Popular Series', f'{Base_API}/v4/series.json?sort=trending&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Best Series', f'{Base_API}/v4/series.json?sort=views&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
+    addDir('Latest Clips', f'{Base_API}/v4/clips.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&t=', '', 1, md + 'DefaultFolder.png', "addons")
 
 
 def INDEX(url):
@@ -91,36 +95,39 @@ def INDEX(url):
     #  Начало на обхождането
     for movie in range(0, len(jsonrsp['response'])):
         if (jsonrsp['response'][movie]['flags']['licensed'] is True or fc == 'true' or debug == 'true'):  # Ако заглавието е лицензирано или са разрешени Фен каналите/дебъг режима
-            if jsonrsp['response'][movie]['type'] == 'series':  # Ако е сериал
+            types = "tvshows" if jsonrsp['response'][movie]['type'] == "series" else "movies"
+
+            try:
+                mt = jsonrsp['response'][movie]['titles'][lang]
+            except KeyError:
+                mt = jsonrsp['response'][movie]['titles']["en"]
+
+            try:
+                pos = str(jsonrsp['response'][movie]['images']['atv_cover']['url'])
+            except KeyError:
+                pos = str(jsonrsp['response'][movie]['images']['poster']['url'])
+
+            if types == "tvshows":
+                mdes = jsonrsp['response'][movie]['descriptions'].get(lang, "")
+                if mdes == "":
+                    mdes = jsonrsp['response'][movie]['descriptions'].get("en", "")
+
+                url = f'{Base_API}/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?page=1&per_page=50&app={_APP}&t={timestamp}'
+                addDir(mt, url, mdes, 2, pos, types)
+            else:
+                at = jsonrsp['response'][movie]['author']
+                mid = str(jsonrsp['response'][movie]['id'])
+                rating = jsonrsp['response'][movie]['rating']
                 try:
-                    mt = str(jsonrsp['response'][movie]['titles'][lang]).encode('utf-8', 'ignore')
-                    mdes = str(jsonrsp['response'][movie]['descriptions'][lang]).encode('utf-8', 'ignore')
-                except KeyError:
-                    mt = str(jsonrsp['response'][movie]['titles']["en"]).encode('utf-8', 'ignore')
-                    mdes = str(jsonrsp['response'][movie]['descriptions']["en"]).encode('utf-8', 'ignore')
-
-                pos = jsonrsp['response'][movie]['images']['poster']['url']
-                xbmcplugin.setContent(int(sys.argv[1]), 'season')
-                addDir(mt, f'https://api.viki.io/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?page=1&per_page=50&app={_APP}&t={timestamp}', mdes, 2, pos, jsonrsp['response'][movie]['type'])
-            else:  # Ако е игрален филм или клип
-                if (jsonrsp['response'][movie]['blocked'] is False or debug == 'true'):  # Проверка за достъпност
-                    dur = str(jsonrsp['response'][movie]['duration'])
-                    hd = str(jsonrsp['response'][movie]['flags']['hd'])
-
-                    try:
-                        mt = jsonrsp['response'][movie]['titles'][lang]
-                    except KeyError:
-                        mt = jsonrsp['response'][movie]['titles']["en"]
-
-                    at = jsonrsp['response'][movie]['author']
-                    mid = str(jsonrsp['response'][movie]['id'])
-                    pos = str(jsonrsp['response'][movie]['images']['poster']['url'])
-                    rating = jsonrsp['response'][movie]['rating']
                     ar = str(jsonrsp['response'][movie]['container']['review_stats']['average_rating'])
-                    xbmcplugin.setContent(int(sys.argv[1]), 'movie')
-                    addLink(mt, mid + '@' + pos + '@' + mt, dur, hd, mt, at, rating, ar, 4, pos, jsonrsp['response'][movie]['type'])
+                except KeyError:
+                    ar = ""
+                dur = str(jsonrsp['response'][movie]['duration'])
+                hd = str(jsonrsp['response'][movie]['flags']['hd'])
+                addLink(mt, mid + '@' + pos + '@' + mt, dur, hd, mt, at, rating, ar, 4, pos, types)
+
     # Край на обхождането
-    
+
     # Ако имаме още страници...
     if jsonrsp['more'] is True:
         getpage = re.compile('(.+?)&page=(.+?)&per_page=(.+?)&t=').findall(url)
@@ -140,7 +147,7 @@ def PREPARE(url):
     opener = urllib.request.build_opener()
     f = opener.open(req)
     jsonrsp = json.loads(f.read())
-    
+
     # Начало на обхождането
     for episode in range(0, len(jsonrsp['response'])):
         if (jsonrsp['response'][episode]['blocked'] is False or debug == 'true'):  # Проверка за достъпност - блокирано или не
@@ -162,11 +169,11 @@ def PREPARE(url):
             hd = str(jsonrsp['response'][episode]['flags']['hd'])
             at = str(jsonrsp['response'][episode]['author'])
             rating = str(jsonrsp['response'][episode]['rating'])
-            addLink(tsn + ' Episode ' + en, ide + '@' + pos + '@' + et, dur, hd, et, at, rating, ar, 4, pos, "episode")
+            addLink(tsn + ' Episode ' + en, ide + '@' + pos + '@' + et, dur, hd, et, at, rating, ar, 4, pos, "episodes")
     if len(jsonrsp['response']) == 0:
         addDir('There are no episodes for now', '', '', '', md + 'DefaultFolderBack.png', "addons")
     # Край на обхождането
-    
+
     # Ако имаме още страници...
     if jsonrsp['more'] is True:
         getpage = re.compile('(.+?)page=(.+?)&per_page').findall(url)
@@ -179,29 +186,29 @@ def PREPARE(url):
 
 # Разлистване по жанр
 def GENRE(url):
-    xbmcplugin.setContent(int(sys.argv[1]), 'season')
-    req = urllib.request.Request('https://api.viki.io/v4/videos/genres.json?app=' + _APP + '')
+    xbmcplugin.setContent(int(sys.argv[1]), 'addons')
+    req = urllib.request.Request(f'{Base_API}/v4/videos/genres.json?app=' + _APP + '')
     req.add_header('User-Agent', UA)
     opener = urllib.request.build_opener()
     f = opener.open(req)
     jsonrsp = json.loads(f.read())
-    
+
     # Начало на обхождането
     for genre in range(0, len(jsonrsp)):
-        addDir(jsonrsp[genre]['name']['en'], 'https://api.viki.io/v4/' + url + '.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&genre=' + jsonrsp[genre]['id'] + '&t=', '', 1, md + 'DefaultFolder.png')
+        addDir(jsonrsp[genre]['name']['en'], f'{Base_API}/v4/' + url + '.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&genre=' + jsonrsp[genre]['id'] + '&t=', '', 1, md + 'DefaultFolder.png', 'addons')
 
 
 # Разлистване по държава
 def COUNTRY(url):
-    xbmcplugin.setContent(int(sys.argv[1]), 'season')
-    req = urllib.request.Request('https://api.viki.io/v4/videos/countries.json?app=' + _APP + '')
+    xbmcplugin.setContent(int(sys.argv[1]), 'addons')
+    req = urllib.request.Request(f'{Base_API}/v4/videos/countries.json?app=' + _APP + '')
     req.add_header('User-Agent', UA)
     opener = urllib.request.build_opener()
     f = opener.open(req)
     jsonrsp = json.loads(f.read())
-    
+
     for country, subdict in jsonrsp.items():
-        addDir(jsonrsp[country]['name']['en'], 'https://api.viki.io/v4/' + url + '.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&origin_country=' + country + '&t=', '', 1, md + 'DefaultFolder.png')
+        addDir(jsonrsp[country]['name']['en'], f'{Base_API}/v4/' + url + '.json?sort=newest_video&page=1&per_page=50&app=' + _APP + '&origin_country=' + country + '&t=', '', 1, md + 'DefaultFolder.png', 'addons')
 
 
 # Търсачка
@@ -233,16 +240,16 @@ def LOADBYID():
 
 def SIGN(pth, version=5):
     timestamp = int(time.time())
-    rawtxt = f'/v{version}/{pth}?drms=dt1,dt2,dt3&device_id={_DEVICE_ID}&app={_APP}'        
+    rawtxt = f'/v{version}/{pth}?drms=dt1,dt2,dt3&device_id={_DEVICE_ID}&app={_APP}'
     sig = hmac.new(
         _APP_SECRET.encode('ascii'), f'{rawtxt}&t={timestamp}'.encode('ascii'), hashlib.sha1).hexdigest()
-    return Base_API % rawtxt, timestamp, sig
+    return Base_API + rawtxt, timestamp, sig
 
 
 # Зареждане на видео и субтитри
 def PLAY(name, url, iconimage):
     url, thumbnail, plot = url.split("@")
-    
+
     urlreq, timestamp, sig = SIGN('playback_streams/' + url + '.json', 5)
 
     req = urllib.request.Request(urlreq)
@@ -269,23 +276,14 @@ def PLAY(name, url, iconimage):
     opener = urllib.request.build_opener()
     f = opener.open(req)
     base64elem = json.loads(f.read())['drm']
+
     decodeData = base64.b64decode(base64elem)
     manifestUrl = json.loads(decodeData)['dt3']
 
     headers = {
-        "Host": "manifest-viki.viki.io",
         "User-Agent": UA,
-        "Accept": "*/*",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate, br",
         "Referer": "https://www.viki.com/",
         "Origin": "https://www.viki.com",
-        "DNT": "1",
-        "Connection": "keep-alive",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "cross-site",
-        "TE": "trailers",
     }
 
     is_helper = inputstreamhelper.Helper('mpd', drm='com.widevine.alpha')
@@ -301,11 +299,11 @@ def PLAY(name, url, iconimage):
             li.setProperty('inputstream', 'inputstream.adaptive')
             li.setProperty('inputstream.adaptive.manifest_type', 'mpd')
             li.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-            li.setProperty('inputstream.adaptive.license_key', manifestUrl + '|%s&Content-Type=|R{SSM}|' % urllib.parse.urlencode(headers))       
-            li.setProperty('inputstream.adaptive.stream_headers', 'User-Agent=' + urllib.parse.quote_plus(UA) + '&Origin=https://www.viki.com&Referer=https://www.viki.com&verifypeer=false')
+            li.setProperty('inputstream.adaptive.license_key', manifestUrl + '|%s&Content-Type=|R{SSM}|' % urllib.parse.urlencode(headers))
+            li.setProperty('inputstream.adaptive.stream_headers', 'User-Agent=' + urllib.parse.quote_plus(UA) + '&Origin=https://www.viki.com&Referer=https://www.viki.com')
         else:
             xbmc.executebuiltin('Notification(%s,  %s,  %d,  %s)' % ('VIKI®', 'API does not return a result', 4000, md + 'OverlayLocked.png'))
-            
+
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem=li)
 
 
@@ -327,11 +325,11 @@ def addLink(name, url, vd, hd, plot, author, rating, ar, mode, iconimage, types)
         liz.addStreamInfo('video', {'aspect': 1.5, 'codec': 'h264'})
     liz.addStreamInfo('audio', {'codec': 'aac', 'channels': 2})
     liz.setProperty("IsPlayable", "true")
-    
+
     contextmenu = []
     contextmenu.append(('Information', 'XBMC.Action(Info)'))
     liz.addContextMenuItems(contextmenu)
-    
+
     ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=False)
     xbmcplugin.setContent(int(sys.argv[1]), types)
     return ok
@@ -371,7 +369,7 @@ def get_params():
             splitparams = pairsofparams[i].split('=')
             if (len(splitparams)) == 2:
                 param[splitparams[0]] = splitparams[1]
-                            
+
     return param
 
 
