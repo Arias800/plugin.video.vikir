@@ -42,18 +42,15 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         result = requests.get(url=self.path.split("url=")[-1]).text
         newMPD = re.search(r'thumbnail_tile".+?\s*<BaseURL>(.+?)<', result)
         if newMPD:
-            xbmc.log("New MPD", level=xbmc.LOGINFO)
             self.path = newMPD.group((1))
             tempres = requests.get(url=self.path).text
 
             getSub = re.search(r"thumbnail_tile.+?Representation>(.*)", result, re.MULTILINE | re.DOTALL).group((1))
-            xbmc.log(getSub, level=xbmc.LOGINFO)
             data = re.findall('<BaseURL>(.+?)<', tempres)
             for d in data:
                 tempres = tempres.replace(d, "https://m-content-viki.s.llnwi.net/" + self.path.split("/")[3] + "/dash/" + d)
             tempres = tempres.rsplit("\n", 4)[0]
             result = tempres + getSub
-            xbmc.log(result, level=xbmc.LOGINFO)
 
         self.send_response(200)
         self.end_headers()

@@ -24,6 +24,7 @@ import base64
 import urllib.parse
 import hmac
 import hashlib
+import requests
 try:
     from urllib import quote_plus
 except ImportError:
@@ -98,16 +99,18 @@ def index(args, searchurl=""):
 
     if hasattr(args, "offset"):
         url = args.series_id + "&page=" + args.offset
+    else:
+        url = args.series_id
 
     timestamp = str(int(time.time()))
-    jsonrsp = api.request(args, args.series_id + "&t=" + timestamp, None)
+    jsonrsp = api.request(args, url + "&t=" + timestamp + "&per_page=50", None)
 
     # check for error
     if "response" not in jsonrsp:
         view.add_item(args, {"title": args._addon.getLocalizedString(30061)})
         view.endofdirectory(args)
         return False
-    xbmc.log(args._lang,level=xbmc.LOGINFO)
+
     for movie in range(0, len(jsonrsp['response'])):
         currentJSon = jsonrsp['response'][movie]
         try:
@@ -140,7 +143,10 @@ def index(args, searchurl=""):
         if types == "tvshows":
             url = f'{Base_API}/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?page=1&per_page=50&app={_APP}&t={timestamp}'
         else:
-            url = str(currentJSon['id'])
+            try:
+                url = str(currentJSon['watch_now']['id'])
+            except:
+                url = str(currentJSon['id'])
 
         # add to view
         view.add_item(args,
@@ -151,16 +157,18 @@ def index(args, searchurl=""):
                        "thumb": poster,
                        "fanart": poster,
                        "mediatype": types,
-                       "series_id": url if types == "tvshows" else "",
+                       "series_id": url if types == "tvshows" else url,
                        "episode_id": url if types == "movies" else "",
                        "mode": "listEpisode" if types == "tvshows" else "videoplay"},
                       isFolder=True if types == "tvshows" else False)
 
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30055),
-                   "offset": int(getattr(args, "offset", 0)) + 30,
-                   "mode": args.mode},
-                  isFolder=True)
+    if len(jsonrsp['response']) == 50:
+        view.add_item(args,
+                    {"title": args._addon.getLocalizedString(30055),
+                    "offset": int(getattr(args, "offset", 1)) + 1,
+                    "mode": args.mode,
+                    "series_id": args.series_id},
+                    isFolder=True)
 
     view.endofdirectory(args)
     return True
@@ -200,13 +208,13 @@ def episode(args):
                        "thumb": poster,
                        "fanart": poster,
                        "mediatype": "episodes",
+                       "series_id": args.series_id,
                        "episode_id": url,
                        "mode": "videoplay"},
                       isFolder=False)
 
     view.endofdirectory(args)
     return True
-
 
 def SIGN(args, pth, version=5):
     timestamp = int(time.time())
@@ -247,7 +255,7 @@ def startplayback(args):
 
     decodeData = base64.b64decode(base64elem)
     manifestUrl = json.loads(decodeData)['dt3']
-    xbmc.log(jsonrsp['main'][0]['url'], level=xbmc.LOGINFO)
+
     headers = {
         "User-Agent": UA,
         "Referer": "https://www.viki.com/",
