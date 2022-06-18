@@ -1,3 +1,8 @@
+*** 0.19.4.21***
+- More maintainable
+- Get access to all quality
+- Basic account support
+
 *** 0.19.4.20***
 - Code cleanup
 

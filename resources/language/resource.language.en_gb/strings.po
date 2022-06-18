@@ -493,7 +493,89 @@ msgctxt "#115"
 msgid "粵語"
 msgstr ""
 
-#empty strings from id 116 to 30201
+msgctxt "#30001"
+msgid "Email adress"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Password"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Add to watchlist"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Configure InputStream Adaptive"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Show watchlist"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Browse Movies by Genre"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Browse Movies by Country"
+msgstr ""
+
+msgctxt "#30044"
+msgid "New Movies"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Recent Movies"
+msgstr ""
+
+msgctxt "#30046"
+msgid "Popular Movies"
+msgstr ""
+
+msgctxt "#30047"
+msgid "Best Movies"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Browse Series by Genre"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Browse Series by Country"
+msgstr ""
+
+msgctxt "#30050"
+msgid "New Series"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Recent Series"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Popular Series"
+msgstr ""
+
+msgctxt "#30053"
+msgid "Best Series"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Latest Clips"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Next page"
+msgstr ""
+
+msgctxt "#30061"
+msgid "An error occurred"
+msgstr ""
 
 msgctxt "#30202"
 msgid "Please switch OFF DEBUG Mode !"
@@ -518,11 +600,11 @@ msgstr ""
 #empty strings from id 30219 to 30303
 
 msgctxt "#30304"
-msgid "Enable subtitles"
+msgid "Configure InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30305"
-msgid "Choose preffered language"
+msgid "Choose preffered subtitle language"
 msgstr ""
 
 #empty strings from id 30306 to 30403
