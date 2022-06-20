@@ -21,14 +21,8 @@ import sys
 import inputstreamhelper
 import json
 import base64
-import urllib.parse
-import hmac
-import hashlib
-import requests
-try:
-    from urllib import quote_plus
-except ImportError:
-    from urllib.parse import quote_plus
+
+from urllib.parse import quote_plus, urlencode
 
 import xbmc
 import xbmcgui
@@ -145,7 +139,7 @@ def index(args, searchurl=""):
         else:
             try:
                 url = str(currentJSon['watch_now']['id'])
-            except:
+            except KeyError:
                 url = str(currentJSon['id'])
 
         # add to view
@@ -164,11 +158,12 @@ def index(args, searchurl=""):
 
     if len(jsonrsp['response']) == 50:
         view.add_item(args,
-                    {"title": args._addon.getLocalizedString(30055),
-                    "offset": int(getattr(args, "offset", 1)) + 1,
-                    "mode": args.mode,
-                    "series_id": args.series_id},
-                    isFolder=True)
+                      {"title": args._addon.getLocalizedString(30055),
+                       "offset": int(getattr(args, "offset", 1)) + 1,
+                       "mode": args.mode,
+                       "mediatype": "tvshows",
+                       "series_id": args.series_id},
+                      isFolder=True)
 
     view.endofdirectory(args)
     return True
@@ -176,7 +171,12 @@ def index(args, searchurl=""):
 
 def episode(args):
     # api request
-    jsonrsp = api.request(args, args.series_id, None)
+    if hasattr(args, "offset"):
+        url = args.series_id + "&page=" + args.offset
+    else:
+        url = args.series_id
+
+    jsonrsp = api.request(args, url, None)
 
     # check for error
     if jsonrsp.get("error"):
@@ -213,45 +213,23 @@ def episode(args):
                        "mode": "videoplay"},
                       isFolder=False)
 
+    if len(jsonrsp['response']) == 50:
+        view.add_item(args,
+                      {"title": args._addon.getLocalizedString(30055),
+                       "offset": int(getattr(args, "offset", 1)) + 1,
+                       "mode": args.mode,
+                       "mediatype": "episodes",
+                       "series_id": args.series_id},
+                      isFolder=True)
+
     view.endofdirectory(args)
     return True
 
-def SIGN(args, pth, version=5):
-    timestamp = int(time.time())
-    rawtxt = f'/v{version}/{pth}?drms=dt1,dt2,dt3&device_id={_DEVICE_ID}&app={_APP}&token={args._auth_token}'
-    sig = hmac.new(
-        _APP_SECRET.encode('ascii'), f'{rawtxt}&t={timestamp}'.encode('ascii'), hashlib.sha1).hexdigest()
-    return Base_API + rawtxt, timestamp, sig
-
 
 def startplayback(args):
-    urlreq, timestamp, sig = SIGN(args, 'playback_streams/' + args.episode_id + '.json', 5)
+    jsonrsp = api.request(args, 'playback_streams/' + args.episode_id + '.json', None, version=5)
 
-    req = urllib.request.Request(urlreq)
-    req.add_header('User-Agent', UA)
-    req.add_header('X-Viki-manufacturer', 'vivo')
-    req.add_header('X-Viki-device-model', 'vivo 1606')
-    req.add_header('X-Viki-device-os-ver', '6.0.1')
-    req.add_header('X-Viki-connection-type', 'WIFI')
-    req.add_header('X-Viki-carrier', '')
-    req.add_header('X-Viki-as-id', '100005a-1625321982-3932')
-    req.add_header('x-viki-app-ver', _APP_VERSION)
-    req.add_header('origin', 'https://www.viki.com')
-    req.add_header('timestamp', str(timestamp))
-    req.add_header('signature', str(sig))
-    opener = urllib.request.build_opener()
-    f = opener.open(req)
-    jsonrsp = json.loads(f.read())
-
-    urlreq = f"https://www.viki.com/api/videos/{args.episode_id}?token={args._auth_token}"
-    req = urllib.request.Request(urlreq)
-    req.add_header('User-Agent', UA)
-    req.add_header('x-client-user-agent', UA)
-    req.add_header('x-viki-app-ver', _APP_VERSION)
-    req.add_header('Referer', 'https://www.viki.com/videos/' + args.episode_id)
-    opener = urllib.request.build_opener()
-    f = opener.open(req)
-    base64elem = json.loads(f.read())['drm']
+    base64elem = api.request(args, f"https://www.viki.com/api/videos/{args.episode_id}?token={args._auth_token}", None)['drm']
 
     decodeData = base64.b64decode(base64elem)
     manifestUrl = json.loads(decodeData)['dt3']
@@ -272,8 +250,8 @@ def startplayback(args):
             li.setProperty('inputstream', 'inputstream.adaptive')
             li.setProperty('inputstream.adaptive.manifest_type', 'mpd')
             li.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-            li.setProperty('inputstream.adaptive.license_key', manifestUrl + '|%s&Content-Type=|R{SSM}|' % urllib.parse.urlencode(headers))
-            li.setProperty('inputstream.adaptive.stream_headers', 'User-Agent=' + urllib.parse.quote_plus(UA) + '&Origin=https://www.viki.com&Referer=https://www.viki.com')
+            li.setProperty('inputstream.adaptive.license_key', manifestUrl + '|%s&Content-Type=|R{SSM}|' % urlencode(headers))
+            li.setProperty('inputstream.adaptive.stream_headers', 'User-Agent=' + quote_plus(UA) + '&Origin=https://www.viki.com&Referer=https://www.viki.com')
         else:
             xbmc.executebuiltin('Notification(%s,  %s,  %d,  %s)' % ('VIKI®', 'API does not return a result', 4000, "" + 'OverlayLocked.png'))
 

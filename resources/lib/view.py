@@ -16,14 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from urllib import quote_plus
-except ImportError:
-    from urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 import xbmcvfs
 import xbmcgui
 import xbmcplugin
+import xbmc
+
 
 # keys allowed in setInfo
 types = ["count", "size", "date", "genre", "country", "year", "episode", "season", "sortepisode", "top250", "setid",
@@ -38,7 +37,7 @@ def endofdirectory(args):
     xbmcplugin.endOfDirectory(handle=int(args._argv[1]))
 
 
-def add_item(args, info, isFolder=True, total_items=0, mediatype="video"):
+def add_item(args, info, isFolder=True):
     """Add item to directory listing.
     """
     # create list item
@@ -49,9 +48,8 @@ def add_item(args, info, isFolder=True, total_items=0, mediatype="video"):
 
     # get url
     u = build_url(args, info)
-    types = infoLabels.get('mediatype', 'addons')
+    mediatype = infoLabels.get('mediatype')
 
-    li.setInfo("video", infoLabels)
     if not isFolder:
         li.setProperty("IsPlayable", "true")
 
@@ -62,30 +60,42 @@ def add_item(args, info, isFolder=True, total_items=0, mediatype="video"):
                "fanart": info.get("fanart", xbmcvfs.translatePath(args._addon.getAddonInfo("fanart"))),
                "icon": info.get("thumb", "DefaultFolder.png")})
 
-    xbmcplugin.setContent(int(args._argv[1]), types)
-    if types == "episodes":
-        # sort methods are required in library mode
+    # Nexus compatibility.
+    if not xbmc.getInfoLabel('system.buildversion')[0:2] >= '20':
+        li.setInfo("video", infoLabels)
+    else:
+        videoInfoTag = li.getVideoInfoTag()
+        videoInfoTag.setMediaType("episode" if mediatype == "episodes" else mediatype)
+        videoInfoTag.setTitle(infoLabels.get('title', ""))
+        videoInfoTag.setTvShowTitle(infoLabels.get('title', ''))
+        videoInfoTag.setPlot(infoLabels.get('plot', ""))
+        try:
+            videoInfoTag.setRating(float(infoLabels.get('rating', 0.0)))
+        except ValueError:
+            # Movie return classification.
+            videoInfoTag.setMpaa(infoLabels.get('rating'))
+        videoInfoTag.setDuration(int(infoLabels.get('duration', 0)))
+        videoInfoTag.setSeason(int(infoLabels.get('season', 1)))
+        videoInfoTag.setEpisode(int(infoLabels.get('episode', 0)))
+
+    xbmcplugin.setContent(int(args._argv[1]), mediatype)
+
+    if mediatype == "episodes":
         xbmcplugin.addSortMethod(int(args._argv[1]), xbmcplugin.SORT_METHOD_EPISODE)
 
     # add item to list
     xbmcplugin.addDirectoryItem(handle=int(args._argv[1]),
                                 url=u,
                                 listitem=li,
-                                isFolder=isFolder,
-                                totalItems=total_items)
+                                isFolder=isFolder)
 
 
-def quote_value(value, PY2):
+def quote_value(value):
     """Quote value depending on python
     """
-    if PY2:
-        if not isinstance(value, basestring):
-            value = str(value)
-        return quote_plus(value.encode("utf-8") if isinstance(value, unicode) else value)
-    else:
-        if not isinstance(value, str):
-            value = str(value)
-        return quote_plus(value)
+    if not isinstance(value, str):
+        value = str(value)
+    return quote_plus(value.encode("utf-8") if isinstance(value, str) else value)
 
 
 def build_url(args, info):
@@ -95,12 +105,12 @@ def build_url(args, info):
     # step 1 copy new information from info
     for key, value in list(info.items()):
         if value:
-            s = s + "&" + key + "=" + quote_value(value, args.PY2)
+            s = s + "&" + key + "=" + quote_value(value)
 
     # step 2 copy old information from args, but don't append twice
     for key, value in list(args.__dict__.items()):
         if value and key in types and not "&" + str(key) + "=" in s:
-            s = s + "&" + key + "=" + quote_value(value, args.PY2)
+            s = s + "&" + key + "=" + quote_value(value)
     return args._argv[0] + "?" + s[1:]
 
 

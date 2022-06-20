@@ -514,7 +514,7 @@ msgid "Search"
 msgstr ""
 
 msgctxt "#30041"
-msgid "Show watchlist"
+msgid "Watchlist"
 msgstr ""
 
 msgctxt "#30042"
@@ -575,80 +575,4 @@ msgstr ""
 
 msgctxt "#30061"
 msgid "An error occurred"
-msgstr ""
-
-msgctxt "#30202"
-msgid "Please switch OFF DEBUG Mode !"
-msgstr ""
-
-#empty string with id 30203
-
-msgctxt "#30204"
-msgid "Order of episodes"
-msgstr ""
-
-msgctxt "#30205"
-msgid "Select preferred video quality"
-msgstr ""
-
-#empty strings from id 30206 to 30217
-
-msgctxt "#30218"
-msgid "PREFERENCES"
-msgstr ""
-
-#empty strings from id 30219 to 30303
-
-msgctxt "#30304"
-msgid "Configure InputStream Adaptive"
-msgstr ""
-
-msgctxt "#30305"
-msgid "Choose preffered subtitle language"
-msgstr ""
-
-#empty strings from id 30306 to 30403
-
-msgctxt "#30404"
-msgid "Enable Fan Channels"
-msgstr ""
-
-msgctxt "#30405"
-msgid "Activate DEBUG Mode"
-msgstr ""
-
-#empty strings from id 30406 to 31020
-
-msgctxt "#31021"
-msgid "descending"
-msgstr ""
-
-msgctxt "#31022"
-msgid "ascending"
-msgstr ""
-
-#empty strings from id 31023 to 32020
-
-msgctxt "#32021"
-msgid "MP4 360p"
-msgstr ""
-
-msgctxt "#32022"
-msgid "MP4 480p"
-msgstr ""
-
-msgctxt "#32023"
-msgid "MPEG-DASH 480p"
-msgstr ""
-
-msgctxt "#32024"
-msgid "MPEG-DASH MOBILE"
-msgstr ""
-
-msgctxt "#32025"
-msgid "HD 720p"
-msgstr ""
-
-msgctxt "#32026"
-msgid "HD 1080p"
 msgstr ""

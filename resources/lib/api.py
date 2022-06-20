@@ -19,18 +19,7 @@ import time
 import hashlib
 import hmac
 import json
-import xbmcvfs
-from os import remove
-from os.path import join
 import requests
-try:
-    from urllib2 import urlopen, build_opener, HTTPCookieProcessor, install_opener
-except ImportError:
-    from urllib.request import urlopen, build_opener, HTTPCookieProcessor, install_opener
-try:
-    from cookielib import LWPCookieJar
-except ImportError:
-    from http.cookiejar import LWPCookieJar
 
 
 class API:
@@ -39,17 +28,21 @@ class API:
     _APP_VERSION = '6.11.3'
     _API_URL_TEMPLATE = 'https://api.viki.io%s'
     _APP_SECRET = 'd96704b180208dbb2efa30fe44c48bd8690441af9f567ba8fd710a72badc85198f7472'
+    session = None
 
 
-def _api_query(path, version=4, **kwargs):
+def _api_query(args, path, version=4, **kwargs):
     path += '?' if '?' not in path else '&'
-    query = f'/v{version}/{path}app={API._APP}'
+    if "playback_streams/" in path:
+        query = f'/v{version}/{path}drms=dt1,dt2,dt3&device_id={API._DEVICE_ID}&app={API._APP}&token={args._auth_token}'
+    else:
+        query = f'/v{version}/{path}app={API._APP}'
     return query + ''.join(f'&{name}={val}' for name, val in kwargs.items())
 
 
-def _sign_query(path, version=4):
+def _sign_query(args, path, version=4):
     timestamp = int(time.time())
-    query = _api_query(path, version)
+    query = _api_query(args, path, version)
     sig = hmac.new(
         API._APP_SECRET.encode('ascii'), f'{query}&t={timestamp}'.encode('ascii'), hashlib.sha1).hexdigest()
     return timestamp, sig, API._API_URL_TEMPLATE % query
@@ -58,22 +51,20 @@ def _sign_query(path, version=4):
 def start(args):
     """Login and session handler
     """
-    # create cookiejar
-    args._cj = LWPCookieJar()
 
     # lets urllib handle cookies
-    opener = build_opener(HTTPCookieProcessor(args._cj))
-    opener.addheaders = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36"),
-                         ('x-viki-app-ver', API._APP_VERSION),
-                         ('Content-Type', 'application/json; charset=utf-8')]
-    install_opener(opener)
-
-    # load cookies
-    try:
-        args._cj.load(getCookiePath(args), ignore_discard=True)
-    except IOError:
-        # cookie file does not exist
-        pass
+    API.session = requests.Session()
+    API.session.headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36",
+                           "x-viki-app-ver": API._APP_VERSION,
+                           "x-client-user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36",
+                           "Content-Type": "application/json; charset=utf-8",
+                           "X-Viki-manufacturer": "vivo",
+                           "X-Viki-device-model": "vivo 1606",
+                           "X-Viki-device-os-ver": "6.0.1",
+                           "X-Viki-connection-type": "WIFI",
+                           "X-Viki-carrier": "",
+                           "X-Viki-as-id": "100005a-1625321982-3932",
+                           "origin": "https://www.viki.com"}
 
     # get login informations
     username = args._addon.getSetting("viki_username")
@@ -99,22 +90,9 @@ def start(args):
             "username": username
         }
 
-        timestamp, sig, url = _sign_query("sessions.json", version=5)
+        timestamp, sig, url = _sign_query(args, "sessions.json", version=5)
 
-        headers = {'accept-language': 'fr',
-                   'timestamp': str(timestamp),
-                   'signature': sig,
-                   'x-viki-app-ver': '6.12.2',
-                   'x-viki-manufacturer': 'vivo',
-                   'x-viki-device-model': 'vivo 1606',
-                   'x-viki-device-os-ver': '9',
-                   'x-viki-connection-type': 'WIFI',
-                   'x-viki-carrier': '',
-                   'x-viki-as-id': '100005a-1625321982-3932',
-                   'content-type': 'application/json; charset=utf-8',
-                   'user-agent': 'okhttp/3.12.12'}
-
-        resp = requests.post(url, headers=headers, json=payload).json()
+        resp = API.session.post(url, json=payload).json()
 
         # check for error
         if resp.get("error"):
@@ -129,8 +107,6 @@ def close(args):
     """
     args._addon.setSetting("user_id", args._user_id)
     args._addon.setSetting("auth_token", args._auth_token)
-    if args._cj:
-        args._cj.save(getCookiePath(args), ignore_discard=True)
 
 
 def destroy(args):
@@ -139,14 +115,9 @@ def destroy(args):
     args._addon.setSetting("user_id", "")
     args._addon.setSetting("auth_token", "")
     args._auth_token = ""
-    args._cj = False
-    try:
-        remove(getCookiePath(args))
-    except WindowsError:
-        pass
 
 
-def request(args, method, options, query=None, failed=False):
+def request(args, method, options, query=None, failed=False, version=4):
     """Viki API Call
     """
     # required in every request
@@ -154,31 +125,21 @@ def request(args, method, options, query=None, failed=False):
 
     if "http" not in method:
         if query is None:
-            timestamp, sig, url = _sign_query(method)
+            timestamp, sig, url = _sign_query(args, method, version)
+            API.session.headers.update({'timestamp': str(timestamp),
+                                        "signature": str(sig)})
         else:
-            url = API._API_URL_TEMPLATE % _api_query(method)
+            url = API._API_URL_TEMPLATE % _api_query(args, method, version)
     else:
         url = method
 
     if options:
         # merge payload with parameters
         payload.update(options)
-        payload = json.dumps(payload).encode("utf-8")
-        response = urlopen(url, payload)
+        response = API.session.get(url, data=json.dumps(payload))
     else:
-        response = urlopen(url)
+        response = API.session.get(url)
 
     # parse response
-    json_data = response.read().decode("utf-8")
-    json_data = json.loads(json_data)
+    json_data = response.json()
     return json_data
-
-
-def getCookiePath(args):
-    """Get cookie file path
-    """
-    profile_path = xbmcvfs.translatePath(args._addon.getAddonInfo("profile"))
-    if args.PY2:
-        return join(profile_path.decode("utf-8"), u"cookies.lwp")
-    else:
-        return join(profile_path, "cookies.lwp")

@@ -14,8 +14,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import sys
 try:
     from urlparse import parse_qs
     from urllib import unquote_plus
@@ -44,12 +42,10 @@ class Args(object):
         """Initialize arguments object
         Hold also references to the addon which can't be kept at module level.
         """
-        self.PY2 = sys.version_info[0] == 2  #: True for Python 2
         self._argv = argv
         self._addonid = self._argv[0][9:-1]
         self._addon = xbmcaddon.Addon(id=self._addonid)
         self._addonname = self._addon.getAddonInfo("name")
-        self._cj = None
 
         for key, value in kwargs.items():
             if value:
