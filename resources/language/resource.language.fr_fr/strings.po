@@ -1,7 +1,7 @@
 # XBMC Media Center language file
 # Addon Name: VIKI®
 # Addon id: plugin.video.vikir
-# Addon version: 0.19.4.9
+# Addon version: 0.19.4.23
 # Addon Provider: Arias800
 msgid ""
 msgstr ""
@@ -547,7 +547,7 @@ msgstr "Les plus populaires de tout les temps"
 
 msgctxt "#30047"
 msgid "Highly Rated"
-msgstr "Les mueux notés"
+msgstr "Les mieux notés"
 
 msgctxt "#30054"
 msgid "Latest Clips"

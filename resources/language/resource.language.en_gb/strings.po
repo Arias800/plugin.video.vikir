@@ -1,7 +1,7 @@
 # XBMC Media Center language file
 # Addon Name: VIKI®
 # Addon id: plugin.video.vikir
-# Addon version: 0.19.4.9
+# Addon version: 0.19.4.23
 # Addon Provider: Majide
 msgid ""
 msgstr ""

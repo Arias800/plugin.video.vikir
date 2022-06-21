@@ -117,7 +117,7 @@ def destroy(args):
     args._auth_token = ""
 
 
-def request(args, method, options, query=None, failed=False, version=4, isJSON=True):
+def request(args, method, options, query=None, failed=False, version=4):
     """Viki API Call
     """
     # required in every request
@@ -141,7 +141,4 @@ def request(args, method, options, query=None, failed=False, version=4, isJSON=T
         response = API.session.get(url)
 
     # parse response
-    if isJSON:
-        return response.json()
-    else:
-        return response
+    return response.json()

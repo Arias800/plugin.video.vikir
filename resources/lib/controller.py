@@ -20,7 +20,6 @@ import sys
 import inputstreamhelper
 import json
 import base64
-import re
 
 from urllib.parse import quote_plus, urlencode
 
@@ -44,14 +43,14 @@ def search(args):
     if (keyb.isConfirmed() and len(keyb.getText()) > 0):
         searchText = quote_plus(keyb.getText())
         searchText = searchText.replace(' ', '+')
-        searchurl = args.series_id + "?page=1&per_page=50&term=" + searchText
+        searchurl = args.series_id + "?per_page=40&term=" + searchText
         index(args, searchurl)
 
 
 def genre(args):
     jsonrsp = api.request(args, "videos/genres.json", None)
     for genre in range(0, len(jsonrsp)):
-        url = args.series_id + '.json?sort=newest_video&page=1&per_page=50&genre=' + jsonrsp[genre]['id']
+        url = args.series_id + '.json?sort=newest_video&per_page=40&genre=' + jsonrsp[genre]['id']
         # add to view
         view.add_item(args,
                       {"title": jsonrsp[genre]['name']['en'],
@@ -67,7 +66,7 @@ def genre(args):
 def country(args):
     jsonrsp = api.request(args, "videos/countries.json", None)
     for country, subdict in jsonrsp.items():
-        url = args.series_id + '.json?sort=newest_video&page=1&per_page=50&origin_country=' + country
+        url = args.series_id + '.json?sort=newest_video&per_page=40&origin_country=' + country
         lang = subdict['name'].get(args._lang)
         if not lang:
             lang = subdict['name']["en"]
@@ -90,9 +89,9 @@ def index(args, searchurl=""):
     if hasattr(args, "offset"):
         url = args.series_id + "&page=" + args.offset
     else:
-        url = args.series_id
+        url = args.series_id + "&page=1"
 
-    jsonrsp = api.request(args, url + "&per_page=50", None)
+    jsonrsp = api.request(args, url + "&per_page=40", None)
 
     # check for error
     if "response" not in jsonrsp:
@@ -130,7 +129,7 @@ def index(args, searchurl=""):
 
         types = "tvshows" if currentJSon['type'] == "series" else "movies"
         if types == "tvshows":
-            url = f'{Base_API}/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?page=1&per_page=50&app={_APP}'
+            url = f'{Base_API}/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?per_page=40&app={_APP}'
         else:
             try:
                 url = str(currentJSon['watch_now']['id'])
@@ -151,7 +150,7 @@ def index(args, searchurl=""):
                        "mode": "listEpisode" if types == "tvshows" else "videoplay"},
                       isFolder=True if types == "tvshows" else False)
 
-    if len(jsonrsp['response']) == 50:
+    if len(jsonrsp['response']) == 40:
         view.add_item(args,
                       {"title": args._addon.getLocalizedString(30055),
                        "offset": int(getattr(args, "offset", 1)) + 1,
@@ -165,11 +164,10 @@ def index(args, searchurl=""):
 
 
 def episode(args):
-    # api request
     if hasattr(args, "offset"):
-        url = re.sub("", args.offset, args.series_id)
+        url = args.series_id + "&page=" + args.offset
     else:
-        url = args.series_id
+        url = args.series_id + "&page=1"
 
     jsonrsp = api.request(args, url, None)
 
@@ -208,12 +206,12 @@ def episode(args):
                        "mode": "videoplay"},
                       isFolder=False)
 
-    if len(jsonrsp['response']) == 50:
+    if len(jsonrsp['response']) == 40:
         view.add_item(args,
                       {"title": args._addon.getLocalizedString(30055),
                        "offset": int(getattr(args, "offset", 1)) + 1,
                        "mode": args.mode,
-                       "mediatype": "episodes",
+                       "mediatype": "addons",
                        "series_id": args.series_id},
                       isFolder=True)
 

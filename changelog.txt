@@ -1,3 +1,9 @@
+*** 0.19.4.23***
+- Cleanup Code
+- Update api
+- Add french translation
+- Update settings.xml format
+
 *** 0.19.4.22***
 - Fix somes movies that did not start.
 - Fix next page

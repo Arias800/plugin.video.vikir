@@ -78,10 +78,10 @@ def add_item(args, info, isFolder=True):
         videoInfoTag.setSeason(int(infoLabels.get('season', 1)))
         videoInfoTag.setEpisode(int(infoLabels.get('episode', 0)))
 
-    xbmcplugin.setContent(int(args._argv[1]), mediatype)
+    xbmcplugin.setContent(int(args._argv[1]), 'videos' if mediatype == 'addons' else mediatype)
 
     if mediatype == "episodes":
-        xbmcplugin.addSortMethod(int(args._argv[1]), xbmcplugin.SORT_METHOD_EPISODE)
+        xbmcplugin.addSortMethod(int(args._argv[1]), xbmcplugin.SORT_METHOD_UNSORTED, labelMask="%H. %T")
 
     # add item to list
     xbmcplugin.addDirectoryItem(handle=int(args._argv[1]),
