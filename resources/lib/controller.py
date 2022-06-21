@@ -16,11 +16,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import time
 import sys
 import inputstreamhelper
 import json
 import base64
+import re
 
 from urllib.parse import quote_plus, urlencode
 
@@ -31,12 +31,8 @@ import xbmcplugin
 from . import api
 from . import view
 
-_DEVICE_ID = '86085977d'  # used for android api
 _APP = '100005a'
-_APP_VERSION = '6.11.3'
-_APP_SECRET = 'd96704b180208dbb2efa30fe44c48bd8690441af9f567ba8fd710a72badc85198f7472'
 Base_API = 'https://api.viki.io'
-Manifest_API = "https://manifest-viki.viki.io%s"
 
 UA = 'Mozilla/5.0 (Macintosh; MacOS X10_14_3; rv;93.0) Gecko/20100101 Firefox/93.0'  # За симулиране на заявка от  компютърен браузър
 
@@ -96,8 +92,7 @@ def index(args, searchurl=""):
     else:
         url = args.series_id
 
-    timestamp = str(int(time.time()))
-    jsonrsp = api.request(args, url + "&t=" + timestamp + "&per_page=50", None)
+    jsonrsp = api.request(args, url + "&per_page=50", None)
 
     # check for error
     if "response" not in jsonrsp:
@@ -135,7 +130,7 @@ def index(args, searchurl=""):
 
         types = "tvshows" if currentJSon['type'] == "series" else "movies"
         if types == "tvshows":
-            url = f'{Base_API}/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?page=1&per_page=50&app={_APP}&t={timestamp}'
+            url = f'{Base_API}/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?page=1&per_page=50&app={_APP}'
         else:
             try:
                 url = str(currentJSon['watch_now']['id'])
@@ -172,7 +167,7 @@ def index(args, searchurl=""):
 def episode(args):
     # api request
     if hasattr(args, "offset"):
-        url = args.series_id + "&page=" + args.offset
+        url = re.sub("", args.offset, args.series_id)
     else:
         url = args.series_id
 
@@ -228,7 +223,6 @@ def episode(args):
 
 def startplayback(args):
     jsonrsp = api.request(args, 'playback_streams/' + args.episode_id + '.json', None, version=5)
-
     base64elem = api.request(args, f"https://www.viki.com/api/videos/{args.episode_id}?token={args._auth_token}", None)['drm']
 
     decodeData = base64.b64decode(base64elem)

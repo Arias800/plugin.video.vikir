@@ -84,6 +84,8 @@ def check_mode(args):
         controller.country(args)
     elif mode == "videoplay":
         controller.startplayback(args)
+    elif mode == "series" or mode == "movies":
+        showCategoriesMenue(args, mode)
     else:
         # unkown mode
         xbmc.log("[PLUGIN] %s: Failed in check_mode '%s'" % (args._addonname, str(mode)), xbmc.LOGERROR)
@@ -99,64 +101,48 @@ def showMainMenue(args):
                   {"title": args._addon.getLocalizedString(30040),
                    "mode": "search",
                    "series_id": "search.json"})
-    # Movie Genre
     view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30042),
-                   "mode": "genre",
-                   "series_id": "movies"})
-    # Movie by Country
+                  {"title": args._addon.getLocalizedString(30038),
+                   "mode": "movies"})
     view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30043),
-                   "mode": "contry",
-                   "series_id": "movies"})
-    # Latest Movie
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30044),
-                   "mode": "index",
-                   "series_id": "movies.json?sort=newest_video"})
-    # Trending Movie
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30046),
-                   "mode": "index",
-                   "series_id": "movies.json?sort=trending"})
-    # Best view movie
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30047),
-                   "mode": "index",
-                   "series_id": "movies.json?sort=views"})
-    # Series by Genre
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30048),
-                   "mode": "genre",
-                   "series_id": "series"})
-    # Serie By Country
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30049),
-                   "mode": "contry",
-                   "series_id": "series"})
-    # New Series
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30050),
-                   "mode": "index",
-                   "series_id": "series.json?sort=newest_video"})
-    # Recent Series
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30051),
-                   "mode": "index",
-                   "series_id": "series.json?sort=views_recent"})
-    # Popular Series
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30052),
-                   "mode": "index",
-                   "series_id": "series.json?sort=trending"})
-    # Best Series
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30053),
-                   "mode": "index",
-                   "series_id": "series.json?sort=views"})
+                  {"title": args._addon.getLocalizedString(30039),
+                   "mode": "series"})
     # Latest clip
     view.add_item(args,
                   {"title": args._addon.getLocalizedString(30054),
                    "mode": "index",
                    "series_id": "clips.json?sort=newest_video"})
+    view.endofdirectory(args)
+
+
+def showCategoriesMenue(args, genre):
+    view.add_item(args,
+                  {"title": args._addon.getLocalizedString(30042),
+                   "mode": "genre",
+                   "series_id": genre})
+    # By Country
+    view.add_item(args,
+                  {"title": args._addon.getLocalizedString(30043),
+                   "mode": "contry",
+                   "series_id": genre})
+    # Latest
+    view.add_item(args,
+                  {"title": args._addon.getLocalizedString(30044),
+                   "mode": "index",
+                   "series_id": genre + ".json?sort=newest_video"})
+    # Recent popular
+    view.add_item(args,
+                  {"title": args._addon.getLocalizedString(30045),
+                   "mode": "index",
+                   "series_id": genre + ".json?sort=viewed"})
+    # Trending
+    view.add_item(args,
+                  {"title": args._addon.getLocalizedString(30046),
+                   "mode": "index",
+                   "series_id": genre + ".json?sort=all_time"})
+    # Best
+    view.add_item(args,
+                  {"title": args._addon.getLocalizedString(30047),
+                   "mode": "index",
+                   "series_id": genre + ".json?sort=average_rating"})
     view.endofdirectory(args)

@@ -509,6 +509,14 @@ msgctxt "#30004"
 msgid "Configure InputStream Adaptive"
 msgstr "Configurer InputStream Adaptive"
 
+msgctxt "#30038"
+msgid "Movies"
+msgstr "Films"
+
+msgctxt "#30039"
+msgid "Series"
+msgstr "Séries"
+
 msgctxt "#30040"
 msgid "Search"
 msgstr "Recherche"
@@ -518,52 +526,28 @@ msgid "Watchlist"
 msgstr "Liste de lecture"
 
 msgctxt "#30042"
-msgid "Browse Movies by Genre"
-msgstr "Parcourir les films par genre"
+msgid "Browse by Genre"
+msgstr "Parcourir par genre"
 
 msgctxt "#30043"
-msgid "Browse Movies by Country"
-msgstr "Parcourir les films par pays"
+msgid "Browse by Country"
+msgstr "Parcourir par pays"
 
 msgctxt "#30044"
-msgid "New Movies"
-msgstr "Nouveaux films"
+msgid "Newest"
+msgstr "Les nouveautés"
 
 msgctxt "#30045"
-msgid "Recent Movies"
-msgstr "Films récents"
+msgid "Popular this week"
+msgstr "Les plus populaires cette semaine"
 
 msgctxt "#30046"
-msgid "Popular Movies"
-msgstr "Films poupulaire"
+msgid "Popular all"
+msgstr "Les plus populaires de tout les temps"
 
 msgctxt "#30047"
-msgid "Best Movies"
-msgstr "Meilleures films"
-
-msgctxt "#30048"
-msgid "Browse Series by Genre"
-msgstr "Parcourir les séries par genre"
-
-msgctxt "#30049"
-msgid "Browse Series by Country"
-msgstr "Parcourir les séries par pays"
-
-msgctxt "#30050"
-msgid "New Series"
-msgstr "Nouvelles séries"
-
-msgctxt "#30051"
-msgid "Recent Series"
-msgstr "Séries récentes"
-
-msgctxt "#30052"
-msgid "Popular Series"
-msgstr "Séries populaires"
-
-msgctxt "#30053"
-msgid "Best Series"
-msgstr "Meilleures séries"
+msgid "Highly Rated"
+msgstr "Les mueux notés"
 
 msgctxt "#30054"
 msgid "Latest Clips"
@@ -576,3 +560,7 @@ msgstr "Page suivante"
 msgctxt "#30061"
 msgid "An error occurred"
 msgstr "Une erreure s'est produite"
+
+msgctxt "#30305"
+msgid "Language"
+msgstr "Langue"

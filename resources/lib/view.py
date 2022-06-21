@@ -48,7 +48,7 @@ def add_item(args, info, isFolder=True):
 
     # get url
     u = build_url(args, info)
-    mediatype = infoLabels.get('mediatype')
+    mediatype = infoLabels.get('mediatype', 'addons')
 
     if not isFolder:
         li.setProperty("IsPlayable", "true")

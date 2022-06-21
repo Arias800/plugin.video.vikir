@@ -509,6 +509,14 @@ msgctxt "#30004"
 msgid "Configure InputStream Adaptive"
 msgstr ""
 
+msgctxt "#30038"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Series"
+msgstr ""
+
 msgctxt "#30040"
 msgid "Search"
 msgstr ""
@@ -518,51 +526,27 @@ msgid "Watchlist"
 msgstr ""
 
 msgctxt "#30042"
-msgid "Browse Movies by Genre"
+msgid "Browse by Genre"
 msgstr ""
 
 msgctxt "#30043"
-msgid "Browse Movies by Country"
+msgid "Browse by Country"
 msgstr ""
 
 msgctxt "#30044"
-msgid "New Movies"
+msgid "Newest"
 msgstr ""
 
 msgctxt "#30045"
-msgid "Recent Movies"
+msgid "Popular this week"
 msgstr ""
 
 msgctxt "#30046"
-msgid "Popular Movies"
+msgid "Popular all"
 msgstr ""
 
 msgctxt "#30047"
-msgid "Best Movies"
-msgstr ""
-
-msgctxt "#30048"
-msgid "Browse Series by Genre"
-msgstr ""
-
-msgctxt "#30049"
-msgid "Browse Series by Country"
-msgstr ""
-
-msgctxt "#30050"
-msgid "New Series"
-msgstr ""
-
-msgctxt "#30051"
-msgid "Recent Series"
-msgstr ""
-
-msgctxt "#30052"
-msgid "Popular Series"
-msgstr ""
-
-msgctxt "#30053"
-msgid "Best Series"
+msgid "Highly Rated"
 msgstr ""
 
 msgctxt "#30054"
@@ -575,4 +559,8 @@ msgstr ""
 
 msgctxt "#30061"
 msgid "An error occurred"
+msgstr ""
+
+msgctxt "#30305"
+msgid "Language"
 msgstr ""
