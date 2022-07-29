@@ -1,3 +1,7 @@
+*** 0.19.4.24***
+- Fix playback
+- Add progress bar
+
 *** 0.19.4.23***
 - Cleanup Code
 - Update api

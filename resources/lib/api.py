@@ -33,10 +33,9 @@ class API:
 
 def _api_query(args, path, version=4, **kwargs):
     path += '?' if '?' not in path else '&'
+    query = f'/v{version}/{path}app={API._APP}'
     if "playback_streams/" in path:
-        query = f'/v{version}/{path}drms=dt1,dt2,dt3&device_id={API._DEVICE_ID}&app={API._APP}&token={args._auth_token}'
-    else:
-        query = f'/v{version}/{path}app={API._APP}'
+        query += '&device_id' + API._DEVICE_ID
     return query + ''.join(f'&{name}={val}' for name, val in kwargs.items())
 
 

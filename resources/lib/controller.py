@@ -99,7 +99,16 @@ def index(args, searchurl=""):
         view.endofdirectory(args)
         return False
 
+    pDialog = xbmcgui.DialogProgressBG()
+    pDialog.create('Viki', 'Loading elements...')
+    count = 0
+    total =  len(jsonrsp['response'])
+
     for movie in range(0, len(jsonrsp['response'])):
+        count += 1
+        iPercent = int(float(count * 100) / total)
+        pDialog.update(iPercent, message='Loading elements...')
+
         currentJSon = jsonrsp['response'][movie]
         try:
             titles = currentJSon['titles'][args._lang]
@@ -159,6 +168,7 @@ def index(args, searchurl=""):
                        "series_id": args.series_id},
                       isFolder=True)
 
+    pDialog.close()
     view.endofdirectory(args)
     return True
 
@@ -177,7 +187,16 @@ def episode(args):
         view.endofdirectory(args)
         return False
 
+    pDialog = xbmcgui.DialogProgressBG()
+    pDialog.create('Viki', 'Loading elements...')
+    count = 0
+    total =  len(jsonrsp['response'])
+
     for episode in range(0, len(jsonrsp['response'])):
+        count += 1
+        iPercent = int(float(count * 100) / total)
+        pDialog.update(iPercent, message='Loading elements...')
+
         try:
             titles = str(jsonrsp['response'][episode]['titles'][args._lang])
         except KeyError:
@@ -215,13 +234,18 @@ def episode(args):
                        "series_id": args.series_id},
                       isFolder=True)
 
+    pDialog.close()
     view.endofdirectory(args)
     return True
 
 
 def startplayback(args):
-    jsonrsp = api.request(args, 'playback_streams/' + args.episode_id + '.json', None, version=5)
-    base64elem = api.request(args, f"https://www.viki.com/api/videos/{args.episode_id}?token={args._auth_token}", None)['drm']
+    jsonrsp = api.request(args, f'playback_streams/{args.episode_id}.json?token={args._auth_token}&drms=dt1,dt2,dt3', None, version=5)
+    try:
+        base64elem = api.request(args, f"https://www.viki.com/api/videos/{args.episode_id}?token={args._auth_token}", None)['drm']
+    except:
+        xbmcgui.Dialog().ok("Viki", "This program is probably accessible for premium only.\nThat's not work with this addon for the moment.")
+        return
 
     decodeData = base64.b64decode(base64elem)
     manifestUrl = json.loads(decodeData)['dt3']
