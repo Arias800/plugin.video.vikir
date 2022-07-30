@@ -21,7 +21,6 @@ import hmac
 import json
 import requests
 
-
 class API:
     _DEVICE_ID = '86085977d'
     _APP = '100005a'
@@ -34,7 +33,7 @@ class API:
 def _api_query(args, path, version=4, **kwargs):
     path += '?' if '?' not in path else '&'
     query = f'/v{version}/{path}app={API._APP}'
-    if "playback_streams/" in path:
+    if "playback_streams/" in path or 'drms.json' in path:
         query += '&device_id' + API._DEVICE_ID
     return query + ''.join(f'&{name}={val}' for name, val in kwargs.items())
 

@@ -240,22 +240,19 @@ def episode(args):
 
 
 def startplayback(args):
-    jsonrsp = api.request(args, f'playback_streams/{args.episode_id}.json?token={args._auth_token}&drms=dt1,dt2,dt3', None, version=5)
-    try:
-        base64elem = api.request(args, f"https://www.viki.com/api/videos/{args.episode_id}?token={args._auth_token}", None)['drm']
-    except:
-        xbmcgui.Dialog().ok("Viki", "This program is probably accessible for premium only.\nThat's not work with this addon for the moment.")
+    jsonrsp = api.request(args, f'playback_streams/{args.episode_id}.json?token={args._auth_token}&drms=dt3', None, version=5)
+    if jsonrsp.get("error") == "Unauthorized request":
+        xbmcgui.Dialog().ok("Viki", "This program need a viki pass.\nUpgrade your account to get access to the paid content")
         return
-
-    decodeData = base64.b64decode(base64elem)
-    manifestUrl = json.loads(decodeData)['dt3']
+    base64elem = api.request(args, f"videos/{args.episode_id}/drms.json?offline=false&stream_ids={jsonrsp['main'][0]['properties']['track']['stream_id']}&dt=dt3&token={args._auth_token}", None, version=5)
+    manifestUrl = base64elem['dt3']
 
     headers = {
         "User-Agent": UA,
         "Referer": "https://www.viki.com/",
         "Origin": "https://www.viki.com",
     }
-
+    
     is_helper = inputstreamhelper.Helper('mpd', drm='com.widevine.alpha')
     if is_helper.check_inputstream():
         if jsonrsp:
