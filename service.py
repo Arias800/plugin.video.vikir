@@ -21,7 +21,7 @@ try:  # Python 3
 except ImportError:  # Python 2
     from SocketServer import TCPServer
 
-addon = xbmcaddon.Addon(id='plugin.video.catchuptvandmore')
+addon = xbmcaddon.Addon(id='plugin.video.vikir')
 
 requests.packages.urllib3.disable_warnings()
 requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
