@@ -30,19 +30,19 @@ import xbmcplugin
 from . import api
 from . import view
 
-_APP = '100005a'
-Base_API = 'https://api.viki.io'
+_APP = "100005a"
+Base_API = "https://api.viki.io"
 
-UA = 'Mozilla/5.0 (Macintosh; MacOS X10_14_3; rv;93.0) Gecko/20100101 Firefox/93.0'  # За симулиране на заявка от  компютърен браузър
+UA = "Mozilla/5.0 (Macintosh; MacOS X10_14_3; rv;93.0) Gecko/20100101 Firefox/93.0"  # За симулиране на заявка от  компютърен браузър
 
 
 def search(args):
-    keyb = xbmc.Keyboard('', 'Search in VIKI® Database')
+    keyb = xbmc.Keyboard("", "Search in VIKI® Database")
     keyb.doModal()
 
-    if (keyb.isConfirmed() and len(keyb.getText()) > 0):
+    if keyb.isConfirmed() and len(keyb.getText()) > 0:
         searchText = quote_plus(keyb.getText())
-        searchText = searchText.replace(' ', '+')
+        searchText = searchText.replace(" ", "+")
         searchurl = args.series_id + "?per_page=40&term=" + searchText
         index(args, searchurl)
 
@@ -50,14 +50,22 @@ def search(args):
 def genre(args):
     jsonrsp = api.request(args, "videos/genres.json", None)
     for genre in range(0, len(jsonrsp)):
-        url = args.series_id + '.json?sort=newest_video&per_page=40&genre=' + jsonrsp[genre]['id']
+        url = (
+            args.series_id
+            + ".json?sort=newest_video&per_page=40&genre="
+            + jsonrsp[genre]["id"]
+        )
         # add to view
-        view.add_item(args,
-                      {"title": jsonrsp[genre]['name']['en'],
-                       "mediatype": "addons",
-                       "mode": "index",
-                       "series_id": url},
-                      isFolder=True)
+        view.add_item(
+            args,
+            {
+                "title": jsonrsp[genre]["name"]["en"],
+                "mediatype": "addons",
+                "mode": "index",
+                "series_id": url,
+            },
+            isFolder=True,
+        )
 
     view.endofdirectory(args)
     return True
@@ -66,17 +74,20 @@ def genre(args):
 def country(args):
     jsonrsp = api.request(args, "videos/countries.json", None)
     for country, subdict in jsonrsp.items():
-        url = args.series_id + '.json?sort=newest_video&per_page=40&origin_country=' + country
-        lang = subdict['name'].get(args._lang)
+        url = (
+            args.series_id
+            + ".json?sort=newest_video&per_page=40&origin_country="
+            + country
+        )
+        lang = subdict["name"].get(args._lang)
         if not lang:
-            lang = subdict['name']["en"]
+            lang = subdict["name"]["en"]
 
-        view.add_item(args,
-                      {"title": lang,
-                       "mediatype": "addons",
-                       "mode": "index",
-                       "series_id": url},
-                      isFolder=True)
+        view.add_item(
+            args,
+            {"title": lang, "mediatype": "addons", "mode": "index", "series_id": url},
+            isFolder=True,
+        )
 
     view.endofdirectory(args)
     return True
@@ -100,73 +111,81 @@ def index(args, searchurl=""):
         return False
 
     pDialog = xbmcgui.DialogProgressBG()
-    pDialog.create('Viki', 'Loading elements...')
+    pDialog.create("Viki", "Loading elements...")
     count = 0
-    total =  len(jsonrsp['response'])
+    total = len(jsonrsp["response"])
 
-    for movie in range(0, len(jsonrsp['response'])):
+    for movie in range(0, len(jsonrsp["response"])):
         count += 1
         iPercent = int(float(count * 100) / total)
-        pDialog.update(iPercent, message='Loading elements...')
+        pDialog.update(iPercent, message="Loading elements...")
 
-        currentJSon = jsonrsp['response'][movie]
+        currentJSon = jsonrsp["response"][movie]
         try:
-            titles = currentJSon['titles'][args._lang]
+            titles = currentJSon["titles"][args._lang]
         except KeyError:
-            titles = currentJSon['titles']["en"]
+            titles = currentJSon["titles"]["en"]
 
         try:
-            poster = str(currentJSon['images']['atv_cover']['url'])
+            poster = str(currentJSon["images"]["atv_cover"]["url"])
         except KeyError:
-            poster = str(currentJSon['images']['poster']['url'])
+            poster = str(currentJSon["images"]["poster"]["url"])
 
         try:
-            mdes = currentJSon['descriptions'][args._lang]
+            mdes = currentJSon["descriptions"][args._lang]
         except KeyError:
             try:
-                mdes = currentJSon['descriptions']["en"]
+                mdes = currentJSon["descriptions"]["en"]
             except KeyError:
                 mdes = ""
         try:
-            dur = str(currentJSon['duration'])
+            dur = str(currentJSon["duration"])
         except KeyError:
             dur = ""
         try:
-            rating = currentJSon['rating']
+            rating = currentJSon["rating"]
         except KeyError:
             rating = ""
 
-        types = "tvshows" if currentJSon['type'] == "series" else "movies"
+        types = "tvshows" if currentJSon["type"] == "series" else "movies"
         if types == "tvshows":
             url = f'{Base_API}/v4/series/{jsonrsp["response"][movie]["id"]}/episodes.json?per_page=40&app={_APP}'
         else:
             try:
-                url = str(currentJSon['watch_now']['id'])
+                url = str(currentJSon["watch_now"]["id"])
             except KeyError:
-                url = str(currentJSon['id'])
+                url = str(currentJSon["id"])
 
         # add to view
-        view.add_item(args,
-                      {"title": titles,
-                       "plot": mdes,
-                       "duration": dur,
-                       "rating": rating,
-                       "thumb": poster,
-                       "fanart": poster,
-                       "mediatype": types,
-                       "series_id": url if types == "tvshows" else url,
-                       "episode_id": url if types == "movies" else "",
-                       "mode": "listEpisode" if types == "tvshows" else "videoplay"},
-                      isFolder=True if types == "tvshows" else False)
+        view.add_item(
+            args,
+            {
+                "title": titles,
+                "plot": mdes,
+                "duration": dur,
+                "rating": rating,
+                "thumb": poster,
+                "fanart": poster,
+                "mediatype": types,
+                "series_id": url if types == "tvshows" else url,
+                "episode_id": url if types == "movies" else "",
+                "mode": "listEpisode" if types == "tvshows" else "videoplay",
+            },
+            isFolder=True if types == "tvshows" else False,
+        )
 
-    if len(jsonrsp['response']) == 40:
-        view.add_item(args,
-                      {"title": args._addon.getLocalizedString(30055),
-                       "offset": int(getattr(args, "offset", 1)) + 1,
-                       "mode": args.mode,
-                       "mediatype": "tvshows",
-                       "series_id": args.series_id},
-                      isFolder=True)
+    if len(jsonrsp["response"]) == 40:
+        view.add_item(
+            args,
+            {
+                "title": args._addon.getLocalizedString(30055),
+                "offset": int(getattr(args, "offset", 1)) + 1,
+                "mode": args.mode,
+                "mediatype": "tvshows",
+                "series_id": args.series_id,
+            },
+            isFolder=True,
+        )
 
     pDialog.close()
     view.endofdirectory(args)
@@ -188,51 +207,59 @@ def episode(args):
         return False
 
     pDialog = xbmcgui.DialogProgressBG()
-    pDialog.create('Viki', 'Loading elements...')
+    pDialog.create("Viki", "Loading elements...")
     count = 0
-    total =  len(jsonrsp['response'])
+    total = len(jsonrsp["response"])
 
-    for episode in range(0, len(jsonrsp['response'])):
+    for episode in range(0, len(jsonrsp["response"])):
         count += 1
         iPercent = int(float(count * 100) / total)
-        pDialog.update(iPercent, message='Loading elements...')
+        pDialog.update(iPercent, message="Loading elements...")
 
         try:
-            titles = str(jsonrsp['response'][episode]['titles'][args._lang])
+            titles = str(jsonrsp["response"][episode]["titles"][args._lang])
         except KeyError:
             try:
-                titles = str(jsonrsp['response'][episode]['titles']['en'])
+                titles = str(jsonrsp["response"][episode]["titles"]["en"])
             except KeyError:
-                titles = jsonrsp['response'][episode]["container"]['titles']["en"]
+                titles = jsonrsp["response"][episode]["container"]["titles"]["en"]
 
-        epNum = str(jsonrsp['response'][episode]['number'])
-        url = str(jsonrsp['response'][episode]['id'])
-        poster = str(jsonrsp['response'][episode]['images']['poster']['url'])
-        dur = str(jsonrsp['response'][episode]['duration'])
-        rating = str(jsonrsp['response'][episode]['rating'])
+        epNum = str(jsonrsp["response"][episode]["number"])
+        url = str(jsonrsp["response"][episode]["id"])
+        poster = str(jsonrsp["response"][episode]["images"]["poster"]["url"])
+        dur = str(jsonrsp["response"][episode]["duration"])
+        rating = str(jsonrsp["response"][episode]["rating"])
 
         # add to view
-        view.add_item(args,
-                      {"title": titles,
-                       "episode": epNum,
-                       "duration": dur,
-                       "rating": rating,
-                       "thumb": poster,
-                       "fanart": poster,
-                       "mediatype": "episodes",
-                       "series_id": args.series_id,
-                       "episode_id": url,
-                       "mode": "videoplay"},
-                      isFolder=False)
+        view.add_item(
+            args,
+            {
+                "title": titles,
+                "episode": epNum,
+                "duration": dur,
+                "rating": rating,
+                "thumb": poster,
+                "fanart": poster,
+                "mediatype": "episodes",
+                "series_id": args.series_id,
+                "episode_id": url,
+                "mode": "videoplay",
+            },
+            isFolder=False,
+        )
 
-    if len(jsonrsp['response']) == 40:
-        view.add_item(args,
-                      {"title": args._addon.getLocalizedString(30055),
-                       "offset": int(getattr(args, "offset", 1)) + 1,
-                       "mode": args.mode,
-                       "mediatype": "addons",
-                       "series_id": args.series_id},
-                      isFolder=True)
+    if len(jsonrsp["response"]) == 40:
+        view.add_item(
+            args,
+            {
+                "title": args._addon.getLocalizedString(30055),
+                "offset": int(getattr(args, "offset", 1)) + 1,
+                "mode": args.mode,
+                "mediatype": "addons",
+                "series_id": args.series_id,
+            },
+            isFolder=True,
+        )
 
     pDialog.close()
     view.endofdirectory(args)
@@ -240,32 +267,63 @@ def episode(args):
 
 
 def startplayback(args):
-    jsonrsp = api.request(args, f'playback_streams/{args.episode_id}.json?token={args._auth_token}&drms=dt3', None, version=5)
+    jsonrsp = api.request(
+        args,
+        f"playback_streams/{args.episode_id}.json?token={args._auth_token}&drms=dt3",
+        None,
+        version=5,
+    )
     if jsonrsp.get("error") == "Unauthorized request":
-        xbmcgui.Dialog().ok("Viki", "This program need a viki pass.\nUpgrade your account to get access to the paid content")
+        xbmcgui.Dialog().ok(
+            "Viki",
+            "This program need a viki pass.\nUpgrade your account to get access to the paid content",
+        )
         return
-    base64elem = api.request(args, f"videos/{args.episode_id}/drms.json?offline=false&stream_ids={jsonrsp['main'][0]['properties']['track']['stream_id']}&dt=dt3&token={args._auth_token}", None, version=5)
-    manifestUrl = base64elem['dt3']
+    base64elem = api.request(
+        args,
+        f"videos/{args.episode_id}/drms.json?offline=false&stream_ids={jsonrsp['main'][0]['properties']['track']['stream_id']}&dt=dt3&token={args._auth_token}",
+        None,
+        version=5,
+    )
+    manifestUrl = base64elem["dt3"]
 
     headers = {
         "User-Agent": UA,
         "Referer": "https://www.viki.com/",
         "Origin": "https://www.viki.com",
     }
-    
-    is_helper = inputstreamhelper.Helper('mpd', drm='com.widevine.alpha')
+
+    is_helper = inputstreamhelper.Helper("mpd", drm="com.widevine.alpha")
     if is_helper.check_inputstream():
         if jsonrsp:
-            li = xbmcgui.ListItem(path="http://127.0.0.1:4920/url=" + jsonrsp['main'][0]['url'])
-            li.setMimeType('application/xml+dash')
+            li = xbmcgui.ListItem(
+                path="http://127.0.0.1:4920/url=" + jsonrsp["main"][0]["url"]
+            )
+            li.setMimeType("application/xml+dash")
             li.setContentLookup(False)
 
-            li.setProperty('inputstream', 'inputstream.adaptive')
-            li.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-            li.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-            li.setProperty('inputstream.adaptive.license_key', manifestUrl + '|%s&Content-Type=|R{SSM}|' % urlencode(headers))
-            li.setProperty('inputstream.adaptive.stream_headers', 'User-Agent=' + quote_plus(UA) + '&Origin=https://www.viki.com&Referer=https://www.viki.com')
+            li.setProperty("inputstream", "inputstream.adaptive")
+            li.setProperty("inputstream.adaptive.manifest_type", "mpd")
+            li.setProperty("inputstream.adaptive.license_type", "com.widevine.alpha")
+            li.setProperty(
+                "inputstream.adaptive.license_key",
+                manifestUrl + "|%s&Content-Type=|R{SSM}|" % urlencode(headers),
+            )
+            li.setProperty(
+                "inputstream.adaptive.stream_headers",
+                "User-Agent="
+                + quote_plus(UA)
+                + "&Origin=https://www.viki.com&Referer=https://www.viki.com",
+            )
         else:
-            xbmc.executebuiltin('Notification(%s,  %s,  %d,  %s)' % ('VIKI®', 'API does not return a result', 4000, "" + 'OverlayLocked.png'))
+            xbmc.executebuiltin(
+                "Notification(%s,  %s,  %d,  %s)"
+                % (
+                    "VIKI®",
+                    "API does not return a result",
+                    4000,
+                    "" + "OverlayLocked.png",
+                )
+            )
 
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem=li)

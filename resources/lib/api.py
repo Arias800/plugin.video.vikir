@@ -21,48 +21,55 @@ import hmac
 import json
 import requests
 
+
 class API:
-    _DEVICE_ID = '86085977d'
-    _APP = '100005a'
-    _APP_VERSION = '6.11.3'
-    _API_URL_TEMPLATE = 'https://api.viki.io%s'
-    _APP_SECRET = 'd96704b180208dbb2efa30fe44c48bd8690441af9f567ba8fd710a72badc85198f7472'
+    _DEVICE_ID = "86085977d"
+    _APP = "100005a"
+    _APP_VERSION = "6.11.3"
+    _API_URL_TEMPLATE = "https://api.viki.io%s"
+    _APP_SECRET = (
+        "d96704b180208dbb2efa30fe44c48bd8690441af9f567ba8fd710a72badc85198f7472"
+    )
     session = None
 
 
 def _api_query(args, path, version=4, **kwargs):
-    path += '?' if '?' not in path else '&'
-    query = f'/v{version}/{path}app={API._APP}'
-    if "playback_streams/" in path or 'drms.json' in path:
-        query += '&device_id' + API._DEVICE_ID
-    return query + ''.join(f'&{name}={val}' for name, val in kwargs.items())
+    path += "?" if "?" not in path else "&"
+    query = f"/v{version}/{path}app={API._APP}"
+    if "playback_streams/" in path or "drms.json" in path:
+        query += "&device_id" + API._DEVICE_ID
+    return query + "".join(f"&{name}={val}" for name, val in kwargs.items())
 
 
 def _sign_query(args, path, version=4):
     timestamp = int(time.time())
     query = _api_query(args, path, version)
     sig = hmac.new(
-        API._APP_SECRET.encode('ascii'), f'{query}&t={timestamp}'.encode('ascii'), hashlib.sha1).hexdigest()
+        API._APP_SECRET.encode("ascii"),
+        f"{query}&t={timestamp}".encode("ascii"),
+        hashlib.sha1,
+    ).hexdigest()
     return timestamp, sig, API._API_URL_TEMPLATE % query
 
 
 def start(args):
-    """Login and session handler
-    """
+    """Login and session handler"""
 
     # lets urllib handle cookies
     API.session = requests.Session()
-    API.session.headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36",
-                           "x-viki-app-ver": API._APP_VERSION,
-                           "x-client-user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36",
-                           "Content-Type": "application/json; charset=utf-8",
-                           "X-Viki-manufacturer": "vivo",
-                           "X-Viki-device-model": "vivo 1606",
-                           "X-Viki-device-os-ver": "6.0.1",
-                           "X-Viki-connection-type": "WIFI",
-                           "X-Viki-carrier": "",
-                           "X-Viki-as-id": "100005a-1625321982-3932",
-                           "origin": "https://www.viki.com"}
+    API.session.headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36",
+        "x-viki-app-ver": API._APP_VERSION,
+        "x-client-user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36",
+        "Content-Type": "application/json; charset=utf-8",
+        "X-Viki-manufacturer": "vivo",
+        "X-Viki-device-model": "vivo 1606",
+        "X-Viki-device-os-ver": "6.0.1",
+        "X-Viki-connection-type": "WIFI",
+        "X-Viki-carrier": "",
+        "X-Viki-as-id": "100005a-1625321982-3932",
+        "origin": "https://www.viki.com",
+    }
 
     # get login informations
     username = args._addon.getSetting("viki_username")
@@ -77,15 +84,15 @@ def start(args):
                 "device": "vivo 1606",
                 "method": "standard",
                 "partner": "viki",
-                "platform": "android"
+                "platform": "android",
             },
             "user": {
                 "registration_method": "standard",
                 "source_device": "vivo 1606",
                 "source_partner": "viki",
-                "source_platform": "android"
+                "source_platform": "android",
             },
-            "username": username
+            "username": username,
         }
 
         timestamp, sig, url = _sign_query(args, "sessions.json", version=5)
@@ -101,31 +108,29 @@ def start(args):
 
 
 def close(args):
-    """Saves cookies and session
-    """
+    """Saves cookies and session"""
     args._addon.setSetting("user_id", args._user_id)
     args._addon.setSetting("auth_token", args._auth_token)
 
 
 def destroy(args):
-    """Destroys session
-    """
+    """Destroys session"""
     args._addon.setSetting("user_id", "")
     args._addon.setSetting("auth_token", "")
     args._auth_token = ""
 
 
 def request(args, method, options, query=None, failed=False, version=4):
-    """Viki API Call
-    """
+    """Viki API Call"""
     # required in every request
     payload = {}
 
     if "http" not in method:
         if query is None:
             timestamp, sig, url = _sign_query(args, method, version)
-            API.session.headers.update({'timestamp': str(timestamp),
-                                        "signature": str(sig)})
+            API.session.headers.update(
+                {"timestamp": str(timestamp), "signature": str(sig)}
+            )
         else:
             url = API._API_URL_TEMPLATE % _api_query(args, method, version)
     else:

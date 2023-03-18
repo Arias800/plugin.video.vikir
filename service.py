@@ -21,10 +21,10 @@ try:  # Python 3
 except ImportError:  # Python 2
     from SocketServer import TCPServer
 
-addon = xbmcaddon.Addon(id='plugin.video.vikir')
+addon = xbmcaddon.Addon(id="plugin.video.vikir")
 
 requests.packages.urllib3.disable_warnings()
-requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
+requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ":HIGH:!DH:!aNULL"
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -37,7 +37,6 @@ PY3 = sys.version_info >= (3, 0, 0)
 
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-
     def do_GET(self):
         result = requests.get(url=self.path.split("url=")[-1]).text
         newMPD = re.search(r'thumbnail_tile".+?\s*<BaseURL>(.+?)<', result)
@@ -45,10 +44,20 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.path = newMPD.group((1))
             tempres = requests.get(url=self.path).text
 
-            getSub = re.search(r"thumbnail_tile.+?Representation>(.*)", result, re.MULTILINE | re.DOTALL).group((1))
-            data = re.findall('<BaseURL>(.+?)<', tempres)
+            getSub = re.search(
+                r"thumbnail_tile.+?Representation>(.*)",
+                result,
+                re.MULTILINE | re.DOTALL,
+            ).group((1))
+            data = re.findall("<BaseURL>(.+?)<", tempres)
             for d in data:
-                tempres = tempres.replace(d, "https://m-content-viki.s.llnwi.net/" + self.path.split("/")[3] + "/dash/" + d)
+                tempres = tempres.replace(
+                    d,
+                    "https://m-content-viki.s.llnwi.net/"
+                    + self.path.split("/")[3]
+                    + "/dash/"
+                    + d,
+                )
             tempres = tempres.rsplit("\n", 4)[0]
             result = tempres + getSub
 
@@ -57,7 +66,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(result.encode("utf-8"))
 
 
-address = '127.0.0.1'  # Localhost
+address = "127.0.0.1"  # Localhost
 
 port = 4920
 
