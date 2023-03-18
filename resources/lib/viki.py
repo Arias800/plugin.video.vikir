@@ -56,9 +56,9 @@ def main(argv):
     else:
         # login failed
         xbmc.log("[PLUGIN] %s: Login failed" % args._addonname, xbmc.LOGERROR)
-        view.add_item(args, {"title": args._addon.getLocalizedString(30060)})
+        view.add_item(args, {"title": args._addon.getLocalizedString(30061)})
         view.endofdirectory(args)
-        xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30060))
+        xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30061))
         return False
 
 

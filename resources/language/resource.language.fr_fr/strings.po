@@ -1,20 +1,20 @@
 # XBMC Media Center language file
 # Addon Name: VIKI®
 # Addon id: plugin.video.vikir
-# Addon version: 0.19.4.23
-# Addon Provider: Arias800
+# Addon version: 0.19.4.27
+# Addon Provider: Arias800, Majide
 msgid ""
 msgstr ""
-"Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2021-01-30 12:27+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
+"Project-Id-Version: plugin.video.vikir\n"
+"Report-Msgid-Bugs-To: https://github.com/Arias800/plugin.video.vikir\n"
+"POT-Creation-Date: 2022-04-08 17:31+0000\n"
+"PO-Revision-Date: 2023-03-17 21:48+0000\n"
+"Last-Translator: azgaresncf\n"
+"Language-Team: Français\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
+"Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "Addon Summary"
@@ -26,7 +26,7 @@ msgid "[B][COLOR red]Before use, set your preferences in the addon settings![/B]
 msgstr "[B][COLOR red]Avant de l'utiliser, définissez vos préférences dans les paramètres de l'addon ![/B][/COLOR] Sur VIKI.COM, regardez les meilleures séries télévisées mondiales, des films, des actualités sur le divertissement et d'autres contenus premium en haute qualité, traduits dans plus de 150 langues par une communauté de fans passionnés. Ensemble, nous faisons tomber les barrières qui se dressent entre le grand divertissement et ses fans, où qu'ils soient !"
 
 msgctxt "Addon Disclaimer"
-msgid "Ce n'est pas une extension officielle ! Si l'application officielle est disponible sur votre plateforme, utilisez-la à la place de cette extension. Tous les droits sur le contenu sont réservés par Rakuten."
+msgid "Ceci n'est pas une extension officielle ! Si l'application officielle est disponible sur votre plateforme, utilisez-la à la place de cette extension. Tous les droits sur le contenu sont réservés par Rakuten."
 msgstr ""
 
 msgctxt "#0"
@@ -494,8 +494,8 @@ msgid "粵語"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Email adress"
-msgstr "Adresse email"
+msgid "Username"
+msgstr "Nom d'utilisateur"
 
 msgctxt "#30002"
 msgid "Password"
@@ -559,7 +559,7 @@ msgstr "Page suivante"
 
 msgctxt "#30061"
 msgid "An error occurred"
-msgstr "Une erreure s'est produite"
+msgstr "Une erreur s'est produite"
 
 msgctxt "#30305"
 msgid "Language"

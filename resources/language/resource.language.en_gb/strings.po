@@ -1,20 +1,20 @@
 # XBMC Media Center language file
 # Addon Name: VIKI®
 # Addon id: plugin.video.vikir
-# Addon version: 0.19.4.23
-# Addon Provider: Majide
+# Addon version: 0.19.4.27
+# Addon Provider: Arias800, Majide
 msgid ""
 msgstr ""
-"Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2021-01-30 12:27+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
+"Project-Id-Version: plugin.video.vikir\n"
+"Report-Msgid-Bugs-To: https://github.com/Arias800/plugin.video.vikir\n"
+"POT-Creation-Date: 2022-04-08 17:31+0000\n"
+"PO-Revision-Date: 2023-03-17 21:48+0000\n"
+"Last-Translator: azgaresncf\n"
+"Language-Team: Français\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
+"Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "Addon Summary"
@@ -494,7 +494,7 @@ msgid "粵語"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Email adress"
+msgid "Username"
 msgstr ""
 
 msgctxt "#30002"
