@@ -24,9 +24,8 @@ import xbmcaddon
 
 
 def parse(argv):
-    """Decode arguments
-    """
-    if (argv[2]):
+    """Decode arguments"""
+    if argv[2]:
         return Args(argv, parse_qs(argv[2][1:]))
     else:
         return Args(argv, {})
@@ -38,6 +37,7 @@ class Args(object):
     reference to the addon. It is intended to hold all data necessary for the
     script.
     """
+
     def __init__(self, argv, kwargs):
         """Initialize arguments object
         Hold also references to the addon which can't be kept at module level.

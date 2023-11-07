@@ -25,11 +25,57 @@ import xbmc
 
 
 # keys allowed in setInfo
-types = ["count", "size", "date", "genre", "country", "year", "episode", "season", "sortepisode", "top250", "setid",
-         "tracknumber", "rating", "userrating", "watched", "playcount", "overlay", "cast", "castandrole", "director",
-         "mpaa", "plot", "plotoutline", "title", "originaltitle", "sorttitle", "duration", "studio", "tagline", "writer",
-         "tvshowtitle", "premiered", "status", "set", "setoverview", "tag", "imdbnumber", "code", "aired", "credits",
-         "lastplayed", "album", "artist", "votes", "path", "trailer", "dateadded", "mediatype", "dbid"]
+types = [
+    "count",
+    "size",
+    "date",
+    "genre",
+    "country",
+    "year",
+    "episode",
+    "season",
+    "sortepisode",
+    "top250",
+    "setid",
+    "tracknumber",
+    "rating",
+    "userrating",
+    "watched",
+    "playcount",
+    "overlay",
+    "cast",
+    "castandrole",
+    "director",
+    "mpaa",
+    "plot",
+    "plotoutline",
+    "title",
+    "originaltitle",
+    "sorttitle",
+    "duration",
+    "studio",
+    "tagline",
+    "writer",
+    "tvshowtitle",
+    "premiered",
+    "status",
+    "set",
+    "setoverview",
+    "tag",
+    "imdbnumber",
+    "code",
+    "aired",
+    "credits",
+    "lastplayed",
+    "album",
+    "artist",
+    "votes",
+    "path",
+    "trailer",
+    "dateadded",
+    "mediatype",
+    "dbid",
+]
 
 
 def endofdirectory(args):
@@ -38,8 +84,7 @@ def endofdirectory(args):
 
 
 def add_item(args, info, isFolder=True):
-    """Add item to directory listing.
-    """
+    """Add item to directory listing."""
     # create list item
     li = xbmcgui.ListItem(label=info["title"])
 
@@ -48,59 +93,66 @@ def add_item(args, info, isFolder=True):
 
     # get url
     u = build_url(args, info)
-    mediatype = infoLabels.get('mediatype', 'addons')
+    mediatype = infoLabels.get("mediatype", "addons")
 
     if not isFolder:
         li.setProperty("IsPlayable", "true")
 
     # set media image
-    li.setArt({"thumb": info.get("thumb", "DefaultFolder.png"),
-               "poster": info.get("thumb", "DefaultFolder.png"),
-               "banner": info.get("thumb", "DefaultFolder.png"),
-               "fanart": info.get("fanart", xbmcvfs.translatePath(args._addon.getAddonInfo("fanart"))),
-               "icon": info.get("thumb", "DefaultFolder.png")})
+    li.setArt(
+        {
+            "thumb": info.get("thumb", "DefaultFolder.png"),
+            "poster": info.get("thumb", "DefaultFolder.png"),
+            "banner": info.get("thumb", "DefaultFolder.png"),
+            "fanart": info.get(
+                "fanart", xbmcvfs.translatePath(args._addon.getAddonInfo("fanart"))
+            ),
+            "icon": info.get("thumb", "DefaultFolder.png"),
+        }
+    )
 
     # Nexus compatibility.
-    if not xbmc.getInfoLabel('system.buildversion')[0:2] >= '20':
+    if not xbmc.getInfoLabel("system.buildversion")[0:2] >= "20":
         li.setInfo("video", infoLabels)
     else:
         videoInfoTag = li.getVideoInfoTag()
         videoInfoTag.setMediaType("episode" if mediatype == "episodes" else mediatype)
-        videoInfoTag.setTitle(infoLabels.get('title', ""))
-        videoInfoTag.setTvShowTitle(infoLabels.get('title', ''))
-        videoInfoTag.setPlot(infoLabels.get('plot', ""))
+        videoInfoTag.setTitle(infoLabels.get("title", ""))
+        videoInfoTag.setTvShowTitle(infoLabels.get("title", ""))
+        videoInfoTag.setPlot(infoLabels.get("plot", ""))
         try:
-            videoInfoTag.setRating(float(infoLabels.get('rating', 0.0)))
+            videoInfoTag.setRating(float(infoLabels.get("rating", 0.0)))
         except ValueError:
             # Movie return classification.
-            videoInfoTag.setMpaa(infoLabels.get('rating'))
-        videoInfoTag.setDuration(int(infoLabels.get('duration', 0)))
-        videoInfoTag.setSeason(int(infoLabels.get('season', 1)))
-        videoInfoTag.setEpisode(int(infoLabels.get('episode', 0)))
+            videoInfoTag.setMpaa(infoLabels.get("rating"))
+        videoInfoTag.setDuration(int(infoLabels.get("duration", 0)))
+        videoInfoTag.setSeason(int(infoLabels.get("season", 1)))
+        videoInfoTag.setEpisode(int(infoLabels.get("episode", 0)))
 
-    xbmcplugin.setContent(int(args._argv[1]), 'videos' if mediatype == 'addons' else mediatype)
+    xbmcplugin.setContent(
+        int(args._argv[1]), "videos" if mediatype == "addons" else mediatype
+    )
 
     if mediatype == "episodes":
-        xbmcplugin.addSortMethod(int(args._argv[1]), xbmcplugin.SORT_METHOD_UNSORTED, labelMask="%H. %T")
+        xbmcplugin.addSortMethod(
+            int(args._argv[1]), xbmcplugin.SORT_METHOD_UNSORTED, labelMask="%H. %T"
+        )
 
     # add item to list
-    xbmcplugin.addDirectoryItem(handle=int(args._argv[1]),
-                                url=u,
-                                listitem=li,
-                                isFolder=isFolder)
+    xbmcplugin.addDirectoryItem(
+        handle=int(args._argv[1]), url=u, listitem=li, isFolder=isFolder
+    )
 
 
 def quote_value(value):
-    """Quote value depending on python
-    """
+    """Quote value depending on python"""
     if not isinstance(value, str):
         value = str(value)
     return quote_plus(value.encode("utf-8") if isinstance(value, str) else value)
 
 
 def build_url(args, info):
-    """Create url
-    """
+    """Create url"""
     s = ""
     # step 1 copy new information from info
     for key, value in list(info.items()):
@@ -115,8 +167,7 @@ def build_url(args, info):
 
 
 def make_infolabel(args, info):
-    """Generate infoLabels from existing dict
-    """
+    """Generate infoLabels from existing dict"""
     infoLabels = {}
     # step 1 copy new information from info
     for key, value in list(info.items()):

@@ -30,8 +30,7 @@ from resources.lib.util import convertLang
 
 
 def main(argv):
-    """Main function for the addon
-    """
+    """Main function for the addon"""
     args = model.parse(argv)
 
     # inputstream adaptive settings
@@ -45,7 +44,7 @@ def main(argv):
     args._user_id = args._addon.getSetting("user_id")
 
     # get subtitle language
-    args._lang = convertLang(args._addon.getSetting('lang'))
+    args._lang = convertLang(args._addon.getSetting("lang"))
 
     # login
     if api.start(args):
@@ -63,8 +62,7 @@ def main(argv):
 
 
 def check_mode(args):
-    """Run mode-specific functions
-    """
+    """Run mode-specific functions"""
     if hasattr(args, "mode"):
         mode = args.mode
     else:
@@ -88,62 +86,100 @@ def check_mode(args):
         showCategoriesMenue(args, mode)
     else:
         # unkown mode
-        xbmc.log("[PLUGIN] %s: Failed in check_mode '%s'" % (args._addonname, str(mode)), xbmc.LOGERROR)
-        xbmcgui.Dialog().notification(args._addonname, args._addon.getLocalizedString(30061), xbmcgui.NOTIFICATION_ERROR)
+        xbmc.log(
+            "[PLUGIN] %s: Failed in check_mode '%s'" % (args._addonname, str(mode)),
+            xbmc.LOGERROR,
+        )
+        xbmcgui.Dialog().notification(
+            args._addonname,
+            args._addon.getLocalizedString(30061),
+            xbmcgui.NOTIFICATION_ERROR,
+        )
         showMainMenue(args)
 
 
 def showMainMenue(args):
-    """Show main menu
-    """
+    """Show main menu"""
     # Search
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30040),
-                   "mode": "search",
-                   "series_id": "search.json"})
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30038),
-                   "mode": "film"})
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30039),
-                   "mode": "series"})
+    view.add_item(
+        args,
+        {
+            "title": args._addon.getLocalizedString(30040),
+            "mode": "search",
+            "series_id": "search.json",
+        },
+    )
+    view.add_item(
+        args, {"title": args._addon.getLocalizedString(30038), "mode": "film"}
+    )
+    view.add_item(
+        args, {"title": args._addon.getLocalizedString(30039), "mode": "series"}
+    )
     # Latest clip
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30054),
-                   "mode": "index",
-                   "series_id": "clips.json?sort=newest_video"})
+    view.add_item(
+        args,
+        {
+            "title": args._addon.getLocalizedString(30054),
+            "mode": "index",
+            "series_id": "clips.json?sort=newest_video",
+        },
+    )
     view.endofdirectory(args)
 
 
 def showCategoriesMenue(args, genre):
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30042),
-                   "mode": "genre",
-                   "series_id": 'movies' if genre == "film" else genre})
+    view.add_item(
+        args,
+        {
+            "title": args._addon.getLocalizedString(30042),
+            "mode": "genre",
+            "series_id": "movies" if genre == "film" else genre,
+        },
+    )
     # By Country
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30043),
-                   "mode": "contry",
-                   "series_id": 'movies' if genre == "film" else genre})
+    view.add_item(
+        args,
+        {
+            "title": args._addon.getLocalizedString(30043),
+            "mode": "contry",
+            "series_id": "movies" if genre == "film" else genre,
+        },
+    )
 
     # Latest
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30044),
-                   "mode": "index",
-                   "series_id": "containers.json?sort=release_date&type=" + genre})
+    view.add_item(
+        args,
+        {
+            "title": args._addon.getLocalizedString(30044),
+            "mode": "index",
+            "series_id": "containers.json?sort=release_date&type=" + genre,
+        },
+    )
     # Recent popular
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30045),
-                   "mode": "index",
-                   "series_id": "containers.json?sort=views_recent&type=" + genre})
+    view.add_item(
+        args,
+        {
+            "title": args._addon.getLocalizedString(30045),
+            "mode": "index",
+            "series_id": "containers.json?sort=views_recent&type=" + genre,
+        },
+    )
     # Trending
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30046),
-                   "mode": "index",
-                   "series_id": "containers.json?sort=views&type=" + genre})
+    view.add_item(
+        args,
+        {
+            "title": args._addon.getLocalizedString(30046),
+            "mode": "index",
+            "series_id": "containers.json?sort=views&type=" + genre,
+        },
+    )
     # Best
-    view.add_item(args,
-                  {"title": args._addon.getLocalizedString(30047),
-                   "mode": "index",
-                   "series_id": "containers.json?sort=average_rating&type=" + genre})
+    view.add_item(
+        args,
+        {
+            "title": args._addon.getLocalizedString(30047),
+            "mode": "index",
+            "series_id": "containers.json?sort=average_rating&type=" + genre,
+        },
+    )
     view.endofdirectory(args)
