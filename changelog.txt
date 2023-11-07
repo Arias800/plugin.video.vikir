@@ -1,3 +1,7 @@
+*** 0.19.4.27***
+- Cleanup code by azgaresncf
+- Refresh account token.
+
 *** 0.19.4.26***
 - Hotfix Kodi 19
 
