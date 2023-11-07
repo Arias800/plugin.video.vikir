@@ -273,12 +273,23 @@ def startplayback(args):
         None,
         version=5,
     )
+
     if jsonrsp.get("error") == "Unauthorized request":
         xbmcgui.Dialog().ok(
             "Viki",
             "This program need a viki pass.\nUpgrade your account to get access to the paid content",
         )
         return
+    # Refresh token
+    elif jsonrsp.get("error") == "invalid token":
+        args._addon.setSetting("auth_token", "")
+        jsonrsp = api.request(
+            args,
+            f"playback_streams/{args.episode_id}.json?token={args._auth_token}&drms=dt3",
+            None,
+            version=5,
+        )
+
     base64elem = api.request(
         args,
         f"videos/{args.episode_id}/drms.json?offline=false&stream_ids={jsonrsp['main'][0]['properties']['track']['stream_id']}&dt=dt3&token={args._auth_token}",
