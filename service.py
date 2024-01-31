@@ -23,16 +23,6 @@ except ImportError:  # Python 2
 
 addon = xbmcaddon.Addon(id="plugin.video.vikir")
 
-requests.packages.urllib3.disable_warnings()
-requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ":HIGH:!DH:!aNULL"
-
-try:
-    _create_unverified_https_context = ssl._create_unverified_context
-except AttributeError:
-    pass
-else:
-    ssl._create_default_https_context = _create_unverified_https_context
-
 PY3 = sys.version_info >= (3, 0, 0)
 
 
