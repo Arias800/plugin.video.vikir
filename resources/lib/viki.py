@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Viki
+"""# Viki
 # Base structure by 2018 MrKrabat
 # Adapted for Viki by Arias800
 #
@@ -14,7 +14,7 @@
 # GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>."""
 
 import inputstreamhelper
 import xbmc
@@ -26,7 +26,7 @@ from . import api
 from . import view
 from . import model
 from . import controller
-from resources.lib.util import convertLang
+from .util import convert_lang
 
 
 def main(argv):
@@ -40,24 +40,24 @@ def main(argv):
             xbmcaddon.Addon(id="inputstream.adaptive").openSettings()
         return True
 
-    args._auth_token = args._addon.getSetting("auth_token")
-    args._user_id = args._addon.getSetting("user_id")
+    args.auth_token = args.addon.getSetting("auth_token")
+    args.user_id = args.addon.getSetting("user_id")
 
     # get subtitle language
-    args._lang = convertLang(args._addon.getSetting("lang"))
+    args.lang = convert_lang(args.addon.getSetting("lang"))
 
     # login
     if api.start(args):
         # list menue
-        xbmcplugin.setContent(int(args._argv[1]), "addons")
+        xbmcplugin.setContent(int(args.argv[1]), "addons")
         check_mode(args)
         api.close(args)
     else:
         # login failed
-        xbmc.log("[PLUGIN] %s: Login failed" % args._addonname, xbmc.LOGERROR)
-        view.add_item(args, {"title": args._addon.getLocalizedString(30061)})
+        xbmc.log(f"[PLUGIN] {args.addonname}: Login failed", xbmc.LOGERROR)
+        view.add_item(args, {"title": args.addon.getLocalizedString(30061)})
         view.endofdirectory(args)
-        xbmcgui.Dialog().ok(args._addonname, args._addon.getLocalizedString(30061))
+        xbmcgui.Dialog().ok(args.addonname, args.addon.getLocalizedString(30061))
         return False
 
 
@@ -69,7 +69,7 @@ def check_mode(args):
         mode = None
 
     if not mode:
-        showMainMenue(args)
+        show_main_menue(args)
     elif mode == "search":
         controller.search(args)
     elif mode == "index":
@@ -82,44 +82,52 @@ def check_mode(args):
         controller.country(args)
     elif mode == "videoplay":
         controller.startplayback(args)
-    elif mode == "series" or mode == "film":
-        showCategoriesMenue(args, mode)
+    elif mode in ("series", "film"):
+        show_categories_menue(args, mode)
     else:
         # unkown mode
         xbmc.log(
-            "[PLUGIN] %s: Failed in check_mode '%s'" % (args._addonname, str(mode)),
+            f"[PLUGIN] {args.addonname}: Failed in check_mode '{mode}'",
             xbmc.LOGERROR,
         )
         xbmcgui.Dialog().notification(
-            args._addonname,
-            args._addon.getLocalizedString(30061),
+            args.addonname,
+            args.addon.getLocalizedString(30061),
             xbmcgui.NOTIFICATION_ERROR,
         )
-        showMainMenue(args)
+        show_main_menue(args)
 
 
-def showMainMenue(args):
+def show_main_menue(args):
     """Show main menu"""
     # Search
     view.add_item(
         args,
         {
-            "title": args._addon.getLocalizedString(30040),
+            "title": args.addon.getLocalizedString(30040),
             "mode": "search",
             "series_id": "search.json",
         },
     )
     view.add_item(
-        args, {"title": args._addon.getLocalizedString(30038), "mode": "film"}
+        args, 
+        {
+            "title": args.addon.getLocalizedString(30038), 
+            "mode": "film",
+        },
     )
     view.add_item(
-        args, {"title": args._addon.getLocalizedString(30039), "mode": "series"}
+        args, 
+        {
+            "title": args.addon.getLocalizedString(30039), 
+            "mode": "series",
+        },
     )
     # Latest clip
     view.add_item(
         args,
         {
-            "title": args._addon.getLocalizedString(30054),
+            "title": args.addon.getLocalizedString(30054),
             "mode": "index",
             "series_id": "clips.json?sort=newest_video",
         },
@@ -127,11 +135,12 @@ def showMainMenue(args):
     view.endofdirectory(args)
 
 
-def showCategoriesMenue(args, genre):
+def show_categories_menue(args, genre):
+    """Show categories menue"""
     view.add_item(
         args,
         {
-            "title": args._addon.getLocalizedString(30042),
+            "title": args.addon.getLocalizedString(30042),
             "mode": "genre",
             "series_id": "movies" if genre == "film" else genre,
         },
@@ -140,7 +149,7 @@ def showCategoriesMenue(args, genre):
     view.add_item(
         args,
         {
-            "title": args._addon.getLocalizedString(30043),
+            "title": args.addon.getLocalizedString(30043),
             "mode": "contry",
             "series_id": "movies" if genre == "film" else genre,
         },
@@ -150,7 +159,7 @@ def showCategoriesMenue(args, genre):
     view.add_item(
         args,
         {
-            "title": args._addon.getLocalizedString(30044),
+            "title": args.addon.getLocalizedString(30044),
             "mode": "index",
             "series_id": "containers.json?sort=release_date&type=" + genre,
         },
@@ -159,7 +168,7 @@ def showCategoriesMenue(args, genre):
     view.add_item(
         args,
         {
-            "title": args._addon.getLocalizedString(30045),
+            "title": args.addon.getLocalizedString(30045),
             "mode": "index",
             "series_id": "containers.json?sort=views_recent&type=" + genre,
         },
@@ -168,7 +177,7 @@ def showCategoriesMenue(args, genre):
     view.add_item(
         args,
         {
-            "title": args._addon.getLocalizedString(30046),
+            "title": args.addon.getLocalizedString(30046),
             "mode": "index",
             "series_id": "containers.json?sort=views&type=" + genre,
         },
@@ -177,7 +186,7 @@ def showCategoriesMenue(args, genre):
     view.add_item(
         args,
         {
-            "title": args._addon.getLocalizedString(30047),
+            "title": args.addon.getLocalizedString(30047),
             "mode": "index",
             "series_id": "containers.json?sort=average_rating&type=" + genre,
         },

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# Viki
-# Base structure by MrKrabat
-# Adapted for this addon by Arias800
+"""# Viki
+# Base structure by 2018 MrKrabat
+# Adapted for Viki by Arias800
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -14,19 +14,18 @@
 # GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+# along with this program.  If not, see <http://www.gnu.org/licenses/>."""
 import sys
 import xbmc
 import xbmcaddon
 
 
 # plugin constants
-_addon = xbmcaddon.Addon(id=sys.argv[0][9:-1])
-_plugin = _addon.getAddonInfo("name")
-_version = _addon.getAddonInfo("version")
+addon = xbmcaddon.Addon(id=sys.argv[0][9:-1])
+_PLUGIN = addon.getAddonInfo("name")
+_VERSION = addon.getAddonInfo("version")
 
-xbmc.log("[PLUGIN] %s: version %s initialized" % (_plugin, _version))
+xbmc.log(f"[PLUGIN] {_PLUGIN}: version {_VERSION} initialized")
 
 if __name__ == "__main__":
     from resources.lib import viki

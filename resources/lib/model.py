@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-# Crunchyroll
-# Copyright (C) 2018 MrKrabat
+"""# Viki
+# Base structure by 2018 MrKrabat
+# Adapted for Viki by Arias800
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -13,7 +14,7 @@
 # GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>."""
 try:
     from urlparse import parse_qs
     from urllib import unquote_plus
@@ -42,10 +43,10 @@ class Args(object):
         """Initialize arguments object
         Hold also references to the addon which can't be kept at module level.
         """
-        self._argv = argv
-        self._addonid = self._argv[0][9:-1]
-        self._addon = xbmcaddon.Addon(id=self._addonid)
-        self._addonname = self._addon.getAddonInfo("name")
+        self.argv = argv
+        self.addonid = self.argv[0][9:-1]
+        self.addon = xbmcaddon.Addon(id=self.addonid)
+        self.addonname = self.addon.getAddonInfo("name")
 
         for key, value in kwargs.items():
             if value:

@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2020, SylvainCecchetto, wwark
+"""# Copyright: (c) 2020, SylvainCecchetto, wwark
 # GNU General Public License v2.0+ (see LICENSE.txt or https://www.gnu.org/licenses/gpl-2.0.txt)
 
-# This file is part of Catch-up TV & More
+# This file is part of Catch-up TV & More"""
 import re
-import requests
 import sys
-import ssl
-
-import xbmc
+import requests
 import xbmcaddon
 
 try:  # Python 3
@@ -27,14 +24,16 @@ PY3 = sys.version_info >= (3, 0, 0)
 
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    """Simple server"""
     def do_GET(self):
-        result = requests.get(url=self.path.split("url=")[-1]).text
-        newMPD = re.search(r'thumbnail_tile".+?\s*<BaseURL>(.+?)<', result)
-        if newMPD:
-            self.path = newMPD.group((1))
-            tempres = requests.get(url=self.path).text
+        """Get function"""
+        result = requests.get(url=self.path.split("url=")[-1], timeout=10).text
+        new_mpd = re.search(r'thumbnail_tile".+?\s*<BaseURL>(.+?)<', result)
+        if new_mpd:
+            self.path = new_mpd.group((1))
+            tempres = requests.get(url=self.path, timeout=10).text
 
-            getSub = re.search(
+            get_sub = re.search(
                 r"thumbnail_tile.+?Representation>(.*)",
                 result,
                 re.MULTILINE | re.DOTALL,
@@ -49,17 +48,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                     + d,
                 )
             tempres = tempres.rsplit("\n", 4)[0]
-            result = tempres + getSub
+            result = tempres + get_sub
 
         self.send_response(200)
         self.end_headers()
         self.wfile.write(result.encode("utf-8"))
 
 
-address = "127.0.0.1"  # Localhost
+ADDRESS = "127.0.0.1"  # Localhost
 
-port = 4920
+PORT = 4920
 
-server_inst = TCPServer((address, port), SimpleHTTPRequestHandler)
+server_inst = TCPServer((ADDRESS, PORT), SimpleHTTPRequestHandler)
 # The follow line is only for test purpose, you have to implement a way to stop the http service!
 server_inst.serve_forever()

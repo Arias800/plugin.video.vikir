@@ -1,3 +1,9 @@
+*** 0.19.4.28***
+- Remove useless SSL workaround
+- Fix pylint.
+- Change "Username" setting to "E-mail".
+- Better error handling.
+
 *** 0.19.4.27***
 - Cleanup code by azgaresncf
 - Refresh account token.

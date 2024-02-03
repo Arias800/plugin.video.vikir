@@ -494,7 +494,7 @@ msgid "粵語"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Username"
+msgid "Email"
 msgstr ""
 
 msgctxt "#30002"
@@ -563,4 +563,8 @@ msgstr ""
 
 msgctxt "#30305"
 msgid "Language"
+msgstr ""
+
+msgctxt "#30306"
+msgid "This program needs a Viki Pass.\nUpgrade your account to gain access to the paid content"
 msgstr ""

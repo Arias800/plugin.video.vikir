@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Viki
+"""# Viki
 # Base structure by 2018 MrKrabat
 # Adapted for Viki by Arias800
 #
@@ -14,7 +14,7 @@
 # GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>."""
 
 from urllib.parse import quote_plus
 
@@ -80,7 +80,7 @@ types = [
 
 def endofdirectory(args):
     # let xbmc know the script is done adding items to the list
-    xbmcplugin.endOfDirectory(handle=int(args._argv[1]))
+    xbmcplugin.endOfDirectory(handle=int(args.argv[1]))
 
 
 def add_item(args, info, isFolder=True):
@@ -105,7 +105,7 @@ def add_item(args, info, isFolder=True):
             "poster": info.get("thumb", "DefaultFolder.png"),
             "banner": info.get("thumb", "DefaultFolder.png"),
             "fanart": info.get(
-                "fanart", xbmcvfs.translatePath(args._addon.getAddonInfo("fanart"))
+                "fanart", xbmcvfs.translatePath(args.addon.getAddonInfo("fanart"))
             ),
             "icon": info.get("thumb", "DefaultFolder.png"),
         }
@@ -130,17 +130,17 @@ def add_item(args, info, isFolder=True):
         videoInfoTag.setEpisode(int(infoLabels.get("episode", 0)))
 
     xbmcplugin.setContent(
-        int(args._argv[1]), "videos" if mediatype == "addons" else mediatype
+        int(args.argv[1]), "videos" if mediatype == "addons" else mediatype
     )
 
     if mediatype == "episodes":
         xbmcplugin.addSortMethod(
-            int(args._argv[1]), xbmcplugin.SORT_METHOD_UNSORTED, labelMask="%H. %T"
+            int(args.argv[1]), xbmcplugin.SORT_METHOD_UNSORTED, labelMask="%H. %T"
         )
 
     # add item to list
     xbmcplugin.addDirectoryItem(
-        handle=int(args._argv[1]), url=u, listitem=li, isFolder=isFolder
+        handle=int(args.argv[1]), url=u, listitem=li, isFolder=isFolder
     )
 
 
@@ -163,7 +163,7 @@ def build_url(args, info):
     for key, value in list(args.__dict__.items()):
         if value and key in types and not "&" + str(key) + "=" in s:
             s = s + "&" + key + "=" + quote_value(value)
-    return args._argv[0] + "?" + s[1:]
+    return args.argv[0] + "?" + s[1:]
 
 
 def make_infolabel(args, info):
